@@ -1,42 +1,36 @@
-import sys, csv, random, statistics
+import sys
 
-# returns a list of 'num' random characters
-# from any of the games
-def getRandomCharacters(num = 10):
-    chars = []
-    # get every character
-    for game in data.keys():
-        for char in data[game].keys():
-            chars.append(char)
-    # randomly delete them
-    while (len(chars) > num):
-        del chars[random.randrange(len(chars))]
-    return chars
-    
-def calculateAverages():
-    avgs = {}
-    for game in data.keys():
-        avgs[game] = { "HP-base": 0, "STR-base": 0, "SKL-base": 0, "SPD-base": 0, "LUK-base": 0, "DEF-base": 0, "RES-base": 0, \
-             "HP-grow": 0, "STR-grow": 0, "SKL-grow": 0, "SPD-grow": 0, "LUK-grow": 0, "DEF-grow": 0, "RES-grow": 0}
-        for stat in avgs[game].keys():
-            # build a list of all the values of a stat for a given game
-            statList = [data[game][c][stat] for c in data[game]]
-            
-            # then get the median
-            avgs[game][stat] = statistics.median(map(int, statList))
-    return avgs
-    
-            
+# my modules
+import generator
+
 ############################
 # parse data files
-data = {
-    'FE1' : {}, 'FE3' : {}, 'FE4' : {}, 'FE5' : {}, 'FE6' : {}, 'FE7' : {}, 'FE8' : {}, 'FE9' : {}, 'FE10' : {}, 'FE13' : {}
-}
+print("Setting up data...")
 
-heads = ["game", "name", "class", "level", "HP-base", "STR-base", "SKL-base", "SPD-base", "LUK-base", "DEF-base", "RES-base", \
-"HP-grow", "STR-grow", "SKL-grow", "SPD-grow", "LUK-grow", "DEF-grow", "RES-grow"]
+data = generator.parseDataFile('chardata.csv')
 
-charfile = open('chardata.csv', newline='')
-charreader = csv.DictReader(charfile, heads, "items")
-for line in charreader:
-    data[line['game']][line['name']] = line
+# figure out which game we're trying to edit
+ver  = "?"
+FILE = open(sys.argv[1], 'rb+')
+FILE.seek(0xAA)
+gameCode = FILE.read(6).decode('UTF-8')
+if gameCode == "E.AE7E" :
+    ver = "FE7"
+elif gameCode == "2EBE8E":
+    ver = "FE8"
+elif gameCode == "6.AFEJ":
+    ver = "FE6"
+else:
+    print("Illegal game version! Please use one of the GBA ROMs.")
+    exit(1)
+print("Game detected as", ver, "... beginning BOOGALOOFICATION")
+
+# GET BOOGALOO!
+averages = generator.calculateAverages(data)
+charlist = generator.getRandomCharacters(data, len(data[ver].keys()))
+replace = {}
+for char in data[ver]:
+    replace[char] = charlist.pop()
+
+for char in replace.keys():
+    print(char, "->", replace[char]['name'], "(" + replace[char]['game'] + ")")
