@@ -1,17 +1,40 @@
-import statistics, csv, random
+import statistics, csv, random, re
 
 # returns a list of 'num' random characters
 # from any game in the given data set
 def getRandomCharacters(data, num = 10):
     chars = []
-    # get every character
+    allChars = []
     for game in data.keys():
-        for char in data[game].keys():
-            chars.append(data[game][char])
-    # randomly delete them
-    while (len(chars) > num):
-        del chars[random.randrange(len(chars))]
+        allChars += [data[game][char] for char in data[game]]
+    
+    # randomly assign characters from said list
+    while (len(chars) < num):
+        check = allChars.pop(random.randrange(len(allChars)))
+        if legalCharacter(check):
+            chars.append(check)
     return chars
+
+# returns whether a character is legal to be boogaloo'd
+# ideally this always returns true but atm there are some limits
+# Illegal characters:
+#  * Lords
+#  * Hidden Weapon users from Fates (eg. Ninjas)
+#  * Non-manakete shapeshifters
+#  * FE7: Manaketes as well
+    
+def legalCharacter(character):
+    if re.search(r'Ninja|Maid|Butler|Mechanist', character['class']):
+        print(character['name'], "is illegal! because they're a waifu panderer")
+        return False
+    elif re.search("Lord", character['class']):
+        # ike doesn't start with the rapier he usually does in fire emblem games so he's ok
+        print(character['name'], "is illegal! because they're a lord")
+        return False
+    elif re.search("tribe|Hawk|Raven|Heron|Cat|Tiger|Dragon|Wolf|Kitsune", character['class']):
+        print(character['name'], "is illegal! because they're a filthy subhuman")
+        return False
+    return True
     
 # calculates a dict of average bases/growths from the given data set
 # uses the median as the average stat
