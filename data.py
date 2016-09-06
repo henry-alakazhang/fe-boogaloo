@@ -1,39 +1,43 @@
 import statistics, csv, random, re
+import fe8
 
 # returns a list of 'num' random characters
-# from any game in the given data set
-def getRandomCharacters(data, num = 10):
-    chars = []
+# to replace characters in the given game
+def getRandomCharacters(data, ver):
+    # create a list of all characters
     allChars = []
     for game in data.keys():
         allChars += [data[game][char] for char in data[game]]
     
     # randomly assign characters from said list
-    while (len(chars) < num):
+    chars = []
+    while (len(chars) < len(data[ver].keys())):
         check = allChars.pop(random.randrange(len(allChars)))
-        if legalCharacter(check):
+        # check if legal before adding
+        if legalCharacter(check, ver):
             chars.append(check)
     return chars
 
 # returns whether a character is legal to be boogaloo'd
 # ideally this always returns true but atm there are some limits
-# Illegal characters:
-#  * Lords
-#  * Hidden Weapon users from Fates (eg. Ninjas)
-#  * Non-manakete shapeshifters
-#  * FE7: Manaketes as well
-    
-def legalCharacter(character):
-    if re.search(r'Ninja|Maid|Butler|Mechanist', character['class']):
-        print(character['name'], "is illegal! because they're a waifu panderer")
-        return False
-    elif re.search("Lord", character['class']):
-        # ike doesn't start with the rapier he usually does in fire emblem games so he's ok
-        print(character['name'], "is illegal! because they're a lord")
-        return False
-    elif re.search("tribe|Hawk|Raven|Heron|Cat|Tiger|Dragon|Wolf|Kitsune", character['class']):
-        print(character['name'], "is illegal! because they're a filthy subhuman")
-        return False
+# mostly nonexistent classes with no equivalent
+# eg.
+#   * Non-dragon shapeshifters (eg. Laguz, Taguel)
+#   * Lords
+#   * Non-Lance Armour Knights and Axe Cavaliers
+#   * Axe Wyverns
+def legalCharacter(character, ver):
+    '''
+    if ver == "FE6":
+        if not fe6.legalCharacter(character):
+            return False
+    if ver == "FE7":
+        if not fe7.legalCharacter(characer):
+            return False
+    '''
+    if ver == "FE8":
+        if not fe8.legalCharacter(character):
+            return False
     return True
     
 # calculates a dict of average bases/growths from the given data set
@@ -41,7 +45,8 @@ def legalCharacter(character):
 def calculateAverages(data):
     avgs = {}
     for game in data.keys():
-        avgs[game] = { "HP-base": 0, "STR-base": 0, "SKL-base": 0, "SPD-base": 0, "LUK-base": 0, "DEF-base": 0, "RES-base": 0, \
+        # atm don't bother with bases
+        avgs[game] = { #"HP-base": 0, "STR-base": 0, "SKL-base": 0, "SPD-base": 0, "LUK-base": 0, "DEF-base": 0, "RES-base": 0, \
              "HP-grow": 0, "STR-grow": 0, "SKL-grow": 0, "SPD-grow": 0, "LUK-grow": 0, "DEF-grow": 0, "RES-grow": 0}
         for stat in avgs[game].keys():
             # build a list of all the values of a stat for a given game
@@ -63,5 +68,21 @@ def parseDataFile(filename):
     charreader = csv.DictReader(charfile, heads, "items")
     for line in charreader:
         data[line['game']][line['name']] = line
+        if line['name'] == "Beruka":
+            print(line)
+    charfile.close()
     
     return data
+
+# rescale the stats in the char list to fit in the new game
+# uses averages of the character's home game and the new game
+def rescaleStats(chars, averages, ver):
+    goal = averages[ver]
+    for c in chars:
+        gameAvgs = averages[chars[c]['game']]
+        for stat in gameAvgs:
+            chars[c][stat] = int(chars[c][stat])
+            if gameAvgs[stat] == 0:
+                gameAvgs[stat] = chars[c][stat] if chars[c][stat] != 0 else 1
+            chars[c][stat] = int(chars[c][stat] * (goal[stat] / gameAvgs[stat]))
+    return chars
