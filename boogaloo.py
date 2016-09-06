@@ -49,14 +49,19 @@ data.rescaleStats(replace, averages, ver)
     
 for char in replace.keys():
     oldChar = rom.getCharData(GAME_DATA, GAME_FILE, char)
-    newstr = GAME_DATA.convertCharacter(None, replace[char])
+    replace[char] = GAME_DATA.convertCharacter(replace[char])
     print (char, "->", replace[char]['name'])
     for stat in replace[char]:
         if stat in oldChar:
             # different stat insertion formula for base stats
-            if re.search("-base", stat) != None:
+            if stat.endswith('base'):
                 print (stat, ":", CHAR_DATA[ver][char][stat], "->", replace[char][stat])
-                oldChar[stat] += (int(replace[char][stat]) - int(CHAR_DATA[ver][char][stat]))
+                oldChar[stat] = int(replace[char][stat]) - GAME_DATA.getClassBases(replace[char]['class'])[stat]
             else:
                 oldChar[stat] = int(replace[char][stat])
+        if stat == 'items':
+            for i in range(4):
+#                print(oldChar['Item ' + str(i+1)], "->", replace[char]['items'][i])
+                oldChar['Item ' + str(i+1)] = replace[char]['items'][i]
+                
     rom.setCharData(GAME_DATA, GAME_FILE, char, oldChar)
