@@ -1,6 +1,12 @@
+# module for fe8's data
+# i probably should have made GAMES a class and instantiated fe8 as one
+
 CHAR_TABLE = 0x803D30
 CHAR_ENTRY_LENGTH = 0x34
 CHAR_UNIT_LENGTH = 20
+
+CLASS_TABLE = 0x807110
+CLASS_ENTRY_LENGTH = 84
 
 CHAR_TO_HEX = {
     'Eirika' : 0x01, 
@@ -49,7 +55,7 @@ def getHexFromChar(name):
 
 def getCharacterAddress(name):
     try:
-        return CHAR_TABLE + CHAR_TO_HEX[name] * CHAR_ENTRY_LENGTH + 1
+        return CHAR_TABLE + getHexFromChar(name) * CHAR_ENTRY_LENGTH + 1
     except:
         return None
         
@@ -170,8 +176,6 @@ CLASS_TO_CLASS = {
     'Dark Knight' : 'Mage Knight',
 }
 
-CLASS_BASES = {'Bishop (F)': {'class': 'Bishop (F)', 'SPD-base': 4, 'HP-base': 19, 'DEF-base': 2, 'STR-base': 4, 'LUK-base': 0, 'RES-base': 9, 'SKL-base': 5}, 'Ranger': {'class': 'Ranger', 'SPD-base': 7, 'HP-base': 21, 'DEF-base': 6,'STR-base': 7, 'LUK-base': 0, 'RES-base': 3, 'SKL-base': 6}, 'Falcon Knight': {'class': 'Falcon Knight', 'SPD-base': 7, 'HP-base': 20, 'DEF-base': 5, 'STR-base': 6, 'LUK-base': 0, 'RES-base': 4, 'SKL-base': 7}, 'Pirate': {'class': 'Pirate', 'SPD-base': 6, 'HP-base': 19, 'DEF-base': 3, 'STR-base': 4, 'LUK-base': 0, 'RES-base': 0, 'SKL-base': 2}, 'Cavalier': {'class': 'Cavalier', 'SPD-base': 5, 'HP-base': 20, 'DEF-base': 6, 'STR-base': 5, 'LUK-base': 0, 'RES-base': 0, 'SKL-base': 2}, 'Shaman': {'class': 'Shaman', 'SPD-base': 2, 'HP-base': 16, 'DEF-base': 2, 'STR-base': 2, 'LUK-base': 0, 'RES-base': 4, 'SKL-base': 1}, 'Pupil (2)': {'class': 'Pupil (2)', 'SPD-base': 3, 'HP-base': 17, 'DEF-base': 3, 'STR-base': 2, 'LUK-base': 0, 'RES-base': 3, 'SKL-base': 3}, 'General (F)': {'class': 'General (F)', 'SPD-base': 5, 'HP-base': 20, 'DEF-base': 11, 'STR-base': 8, 'LUK-base':0, 'RES-base': 4, 'SKL-base': 5}, 'Mercenary': {'class': 'Mercenary', 'SPD-base': 8, 'HP-base': 18, 'DEF-base': 4, 'STR-base': 4, 'LUK-base': 0, 'RES-base': 0, 'SKL-base': 8}, 'Great Knight (F)': {'class': 'Great Knight(F)', 'SPD-base': 7, 'HP-base': 20, 'DEF-base': 9, 'STR-base': 6, 'LUK-base': 0, 'RES-base': 3, 'SKL-base':6}, 'Wight (Bow)': {'class': 'Wight (Bow)', 'SPD-base': 5, 'HP-base': 21, 'DEF-base': 5, 'STR-base': 6, 'LUK-base': 0, 'RES-base': 2, 'SKL-base': 6}, 'Great Lord (Eirika)': {'class': 'Great Lord (Eirika)', 'SPD-base': 4, 'HP-base': 18, 'DEF-base': 5, 'STR-base': 3, 'LUK-base': 0, 'RES-base': 0, 'SKL-base': 3}, 'Phantom': {'class': 'Phantom', 'SPD-base': 4, 'HP-base': 1, 'DEF-base': 0, 'STR-base': 5, 'LUK-base': 0, 'RES-base': 0, 'SKL-base': 2}, 'Elder Bael': {'class': 'Elder Bael', 'SPD-base': 5, 'HP-base': 36, 'DEF-base': 9, 'STR-base': 8, 'LUK-base': 0, 'RES-base': 4, 'SKL-base': 5}, 'Wyvern Lord': {'class': 'Wyvern Lord', 'SPD-base': 7, 'HP-base': 25, 'DEF-base': 10, 'STR-base': 9, 'LUK-base': 0, 'RES-base': 1, 'SKL-base': 5}, 'Summoner': {'class': 'Summoner', 'SPD-base': 4, 'HP-base': 18, 'DEF-base': 3, 'STR-base': 5, 'LUK-base': 0, 'RES-base': 5, 'SKL-base':3}, 'Dancer': {'class': 'Dancer', 'SPD-base': 7, 'HP-base': 14, 'DEF-base': 0, 'STR-base': 1, 'LUK-base': 0, 'RES-base': 1, 'SKL-base': 2}, 'Gorgon Egg': {'class': 'Gorgon Egg', 'SPD-base': 0, 'HP-base': 50, 'DEF-base':10, 'STR-base': 0, 'LUK-base': 0, 'RES-base': 10, 'SKL-base': 0}, 'Fleet': {'class': 'Fleet', 'SPD-base': 2, 'HP-base': 19, 'DEF-base': 5, 'STR-base': 1, 'LUK-base': 0, 'RES-base': 0, 'SKL-base': 1}, 'Soldier': {'class': 'Soldier', 'SPD-base': 1, 'HP-base': 20, 'DEF-base': 0, 'STR-base': 3, 'LUK-base': 0, 'RES-base': 0, 'SKL-base': 0}, 'Wyvern Knight (F)': {'class': 'Wyvern Knight (F)', 'SPD-base': 9, 'HP-base': 19, 'DEF-base': 6, 'STR-base': 6, 'LUK-base': 0, 'RES-base': 2, 'SKL-base': 8}, 'Assassin (F)': {'class': 'Assassin (F)', 'SPD-base': 9, 'HP-base': 16, 'DEF-base': 2, 'STR-base': 3, 'LUK-base': 0, 'RES-base': 0, 'SKL-base': 1}, 'Lord (Ephraim)': {'class': 'Lord (Ephraim)', 'SPD-base': 7, 'HP-base': 18, 'DEF-base': 6, 'STR-base': 6, 'LUK-base': 0, 'RES-base': 0, 'SKL-base': 6}, 'Bonewalker (Sw/Ln)': {'class': 'Bonewalker (Sw/Ln)', 'SPD-base': 3, 'HP-base': 20, 'DEF-base': 3, 'STR-base': 4, 'LUK-base': 0, 'RES-base': 0, 'SKL-base': 2}, 'Cavalier (F)': {'class': 'Cavalier (F)', 'SPD-base': 3, 'HP-base': 18, 'DEF-base': 6, 'STR-base': 5, 'LUK-base': 0, 'RES-base': 0, 'SKL-base': 3}, 'Pupil': {'class': 'Pupil', 'SPD-base': 1, 'HP-base': 13, 'DEF-base': 0, 'STR-base': 1, 'LUK-base':0, 'RES-base': 3, 'SKL-base': 0}, 'Bishop': {'class': 'Bishop', 'SPD-base': 4, 'HP-base': 21, 'DEF-base': 3, 'STR-base': 4, 'LUK-base': 0, 'RES-base': 8, 'SKL-base': 4}, 'Mage Knight': {'class': 'Mage Knight', 'SPD-base': 5, 'HP-base': 20, 'DEF-base': 5, 'STR-base': 4, 'LUK-base': 0, 'RES-base': 5, 'SKL-base': 3}, 'Wyvern Rider': {'class': 'Wyvern Rider', 'SPD-base': 5, 'HP-base': 20, 'DEF-base': 8, 'STR-base': 7, 'LUK-base': 0, 'RES-base': 0, 'SKL-base': 3}, 'Gwyllgi': {'class': 'Gwyllgi', 'SPD-base': 12, 'HP-base': 21, 'DEF-base': 5, 'STR-base': 6, 'LUK-base': 0, 'RES-base': 2, 'SKL-base': 12}, 'Gorgon': {'class': 'Gorgon', 'SPD-base': 4, 'HP-base': 19, 'DEF-base': 5, 'STR-base': 8, 'LUK-base': 0, 'RES-base': 7, 'SKL-base': 3}, 'Priest': {'class': 'Priest', 'SPD-base': 2, 'HP-base': 18, 'DEF-base': 1, 'STR-base': 1, 'LUK-base': 0, 'RES-base': 5, 'SKL-base':1}, 'Revenant': {'class': 'Revenant', 'SPD-base': 0, 'HP-base': 25, 'DEF-base': 0, 'STR-base': 2, 'LUK-base':0, 'RES-base': 0, 'SKL-base': 0}, 'Mercenary (F)': {'class': 'Mercenary (F)', 'SPD-base': 6, 'HP-base': 16, 'DEF-base': 2, 'STR-base': 3, 'LUK-base': 0, 'RES-base': 0, 'SKL-base': 5}, 'Wight (Sword/Lance)': {'class': 'Wight (Sword/Lance)', 'SPD-base': 6, 'HP-base': 21, 'DEF-base': 5, 'STR-base': 7, 'LUK-base': 0, 'RES-base': 2, 'SKL-base': 5}, 'Mage Knight (F)': {'class': 'Mage Knight (F)', 'SPD-base': 6, 'HP-base': 19, 'DEF-base': 3, 'STR-base': 3, 'LUK-base': 0, 'RES-base': 6, 'SKL-base': 5}, 'Journeyman (2)': {'class': 'Journeyman (2)', 'SPD-base': 4, 'HP-base': 20, 'DEF-base': 2, 'STR-base': 5, 'LUK-base': 0, 'RES-base': 1, 'SKL-base': 3}, 'Cyclops': {'class': 'Cyclops', 'SPD-base': 6, 'HP-base': 40, 'DEF-base': 13, 'STR-base': 8, 'LUK-base': 0, 'RES-base': 0, 'SKL-base': 5}, 'Recruit (2)': {'class': 'Recruit (2)', 'SPD-base': 3, 'HP-base': 18, 'DEF-base': 6, 'STR-base': 5, 'LUK-base': 0, 'RES-base': 0, 'SKL-base': 3}, 'Manakete (F)': {'class': 'Manakete (F)', 'SPD-base': 2, 'HP-base': 12, 'DEF-base': 2, 'STR-base': 0, 'LUK-base': 0, 'RES-base': 2, 'SKL-base': 0}, 'Valkyrie': {'class': 'Valkyrie', 'SPD-base': 5, 'HP-base': 19, 'DEF-base': 4, 'STR-base': 4, 'LUK-base': 0, 'RES-base':8, 'SKL-base': 3}, 'Paladin': {'class': 'Paladin', 'SPD-base': 7, 'HP-base': 23, 'DEF-base': 8, 'STR-base': 7, 'LUK-base': 0, 'RES-base': 3, 'SKL-base': 4}, 'Hero (F)': {'class': 'Hero (F)', 'SPD-base': 11, 'HP-base': 22, 'DEF-base': 6, 'STR-base': 6, 'LUK-base': 0, 'RES-base': 3, 'SKL-base': 10}, 'Fighter': {'class': 'Fighter', 'SPD-base': 4, 'HP-base': 20, 'DEF-base': 2, 'STR-base': 5, 'LUK-base': 0, 'RES-base': 0, 'SKL-base': 2}, 'Pupil (3)': {'class': 'Pupil (3)', 'SPD-base': 4, 'HP-base': 20, 'DEF-base': 5, 'STR-base': 5, 'LUK-base': 0, 'RES-base': 5, 'SKL-base': 4}, 'Swordmaster (F)': {'class': 'Swordmaster (F)', 'SPD-base': 12, 'HP-base': 19, 'DEF-base': 4, 'STR-base': 6, 'LUK-base': 0, 'RES-base': 3, 'SKL-base': 11}, 'Manakete': {'class': 'Manakete', 'SPD-base': 2, 'HP-base': 20, 'DEF-base': 1, 'STR-base': 0, 'LUK-base': 0, 'RES-base': 1, 'SKL-base': 0}, 'Shaman (F)': {'class': 'Shaman (F)', 'SPD-base': 1, 'HP-base': 15, 'DEF-base': 1, 'STR-base': 3, 'LUK-base': 0, 'RES-base': 5, 'SKL-base': 1}, 'Mage (F)': {'class': 'Mage (F)', 'SPD-base': 2, 'HP-base': 16, 'DEF-base': 2, 'STR-base': 1, 'LUK-base': 0, 'RES-base': 4, 'SKL-base': 3}, 'Sniper': {'class': 'Sniper', 'SPD-base': 5, 'HP-base': 21, 'DEF-base': 5, 'STR-base': 7, 'LUK-base': 0, 'RES-base': 2, 'SKL-base': 6}, 'Great Knight': {'class': 'Great Knight', 'SPD-base': 6, 'HP-base': 21, 'DEF-base': 11, 'STR-base': 8, 'LUK-base': 0, 'RES-base': 3, 'SKL-base': 4}, 'Gargoyle': {'class': 'Gargoyle', 'SPD-base': 6, 'HP-base': 19, 'DEF-base': 6, 'STR-base': 6, 'LUK-base': 0, 'RES-base': 0, 'SKL-base': 3}, 'Lord (Eirika)': {'class': 'Lord (Eirika)', 'SPD-base': 9, 'HP-base': 16, 'DEF-base': 3, 'STR-base': 4, 'LUK-base': 0, 'RES-base': 1, 'SKL-base': 8}, 'Journeyman (3)': {'class': 'Journeyman (3)', 'SPD-base': 6, 'HP-base': 28, 'DEF-base': 5, 'STR-base': 8, 'LUK-base': 0, 'RES-base': 0, 'SKL-base': 5}, 'Brigand': {'class': 'Brigand', 'SPD-base': 5, 'HP-base': 20, 'DEF-base': 3, 'STR-base': 5, 'LUK-base': 0, 'RES-base': 0, 'SKL-base': 1}, 'Rogue': {'class': 'Rogue', 'SPD-base': 9, 'HP-base':16, 'DEF-base': 2, 'STR-base': 3, 'LUK-base': 0, 'RES-base': 0, 'SKL-base': 1}, 'Bonewalker (Bow)': {'class': 'Bonewalker (Bow)', 'SPD-base': 2, 'HP-base': 18, 'DEF-base': 3, 'STR-base': 4, 'LUK-base': 0, 'RES-base': 0, 'SKL-base': 3}, 'Ranger (F)': {'class': 'Ranger (F)', 'SPD-base': 7, 'HP-base': 21, 'DEF-base': 5, 'STR-base': 6, 'LUK-base': 0, 'RES-base': 4, 'SKL-base': 6}, 'Recruit (3)': {'class': 'Recruit (3)', 'SPD-base': 11, 'HP-base': 23, 'DEF-base': 7, 'STR-base': 6, 'LUK-base': 0, 'RES-base': 6, 'SKL-base': 6}, 'Wyvern Rider (F)': {'class': 'Wyvern Rider (F)', 'SPD-base': 5, 'HP-base': 19, 'DEF-base': 7, 'STR-base': 6, 'LUK-base': 0, 'RES-base': 0, 'SKL-base': 5}, 'Draco Zombie': {'class': 'Draco Zombie', 'SPD-base': 1, 'HP-base': 53, 'DEF-base': 0, 'STR-base': 1, 'LUK-base': 0, 'RES-base': 3, 'SKL-base': 0}, 'Sniper (F)': {'class': 'Sniper (F)', 'SPD-base': 7, 'HP-base': 19, 'DEF-base': 5, 'STR-base': 6, 'LUK-base': 0, 'RES-base': 3, 'SKL-base': 6}, 'Myrmidon': {'class': 'Myrmidon', 'SPD-base': 9, 'HP-base': 16, 'DEF-base': 2, 'STR-base': 4, 'LUK-base': 0, 'RES-base': 0, 'SKL-base': 9}, 'Troubadour': {'class': 'Troubadour', 'SPD-base': 3, 'HP-base': 15, 'DEF-base': 2, 'STR-base': 1, 'LUK-base': 0, 'RES-base': 5, 'SKL-base': 1}, 'Bael': {'class': 'Bael', 'SPD-base': 3, 'HP-base': 25, 'DEF-base': 6, 'STR-base': 6, 'LUK-base': 0, 'RES-base': 1, 'SKL-base': 3}, 'Great Lord (Ephraim)': {'class': 'Great Lord (Ephraim)', 'SPD-base': 4, 'HP-base': 18, 'DEF-base': 5, 'STR-base': 3, 'LUK-base': 0, 'RES-base': 0, 'SKL-base': 3}, 'Journeyman': {'class': 'Journeyman', 'SPD-base': 1, 'HP-base': 14, 'DEF-base': 1, 'STR-base': 3, 'LUK-base': 0, 'RES-base': 0, 'SKL-base': 0}, 'Mauthe Doog': {'class': 'Mauthe Doog', 'SPD-base': 10, 'HP-base': 16, 'DEF-base': 2, 'STR-base': 4, 'LUK-base': 0, 'RES-base': 0, 'SKL-base': 10}, 'Wyvern Lord (F)': {'class': 'Wyvern Lord (F)', 'SPD-base': 7, 'HP-base': 24, 'DEF-base': 9, 'STR-base': 8, 'LUK-base': 0, 'RES-base': 2, 'SKL-base': 7}, 'Archer': {'class': 'Archer', 'SPD-base': 3, 'HP-base': 18, 'DEF-base': 3, 'STR-base': 4, 'LUK-base': 0, 'RES-base': 0, 'SKL-base': 3}, 'Swordmaster': {'class': 'Swordmaster', 'SPD-base': 10, 'HP-base': 21, 'DEF-base': 5, 'STR-base': 6, 'LUK-base': 0, 'RES-base': 2, 'SKL-base': 11}, 'Paladin (F)':{'class': 'Paladin (F)', 'SPD-base': 11, 'HP-base': 23, 'DEF-base': 7, 'STR-base': 6, 'LUK-base': 0, 'RES-base': 6, 'SKL-base': 6}, 'Thief': {'class': 'Thief', 'SPD-base': 9, 'HP-base': 16, 'DEF-base': 2, 'STR-base': 3, 'LUK-base': 0, 'RES-base': 0, 'SKL-base': 1}, 'Recruit': {'class': 'Recruit', 'SPD-base': 1, 'HP-base': 13,'DEF-base': 0, 'STR-base': 3, 'LUK-base': 0, 'RES-base': 1, 'SKL-base': 0}, 'Hero': {'class': 'Hero', 'SPD-base': 10, 'HP-base': 22, 'DEF-base': 8, 'STR-base': 6, 'LUK-base': 0, 'RES-base': 2, 'SKL-base': 9}, 'Monk': {'class': 'Monk', 'SPD-base': 2, 'HP-base': 18, 'DEF-base': 1, 'STR-base': 1, 'LUK-base': 0, 'RES-base': 5, 'SKL-base': 1}, 'Pegasus Knight': {'class': 'Pegasus Knight', 'SPD-base': 5, 'HP-base': 14, 'DEF-base': 3, 'STR-base': 4, 'LUK-base': 0, 'RES-base': 2, 'SKL-base': 5}, 'Demon King': {'class': 'Demon King', 'SPD-base': 18, 'HP-base': 60, 'DEF-base': 25, 'STR-base': 23, 'LUK-base': 0, 'RES-base': 25, 'SKL-base': 20}, 'Maelduin':{'class': 'Maelduin', 'SPD-base': 7, 'HP-base': 25, 'DEF-base': 9, 'STR-base': 8, 'LUK-base': 0, 'RES-base': 3, 'SKL-base': 4}, 'Sage': {'class': 'Sage', 'SPD-base': 4, 'HP-base': 20, 'DEF-base': 5, 'STR-base': 5, 'LUK-base': 0, 'RES-base': 5, 'SKL-base': 4}, 'Summoner (F)': {'class': 'Summoner (F)', 'SPD-base': 4, 'HP-base': 18, 'DEF-base': 3, 'STR-base': 5, 'LUK-base': 0, 'RES-base': 5, 'SKL-base': 3}, 'General': {'class': 'General', 'SPD-base': 3, 'HP-base': 21, 'DEF-base': 13, 'STR-base': 8, 'LUK-base': 0, 'RES-base': 3, 'SKL-base': 4}, 'Tarvos': {'class': 'Tarvos', 'SPD-base': 5, 'HP-base': 21, 'DEF-base': 7, 'STR-base': 6, 'LUK-base': 0, 'RES-base': 0, 'SKL-base': 2}, 'Archer (F)': {'class': 'Archer (F)', 'SPD-base': 4, 'HP-base': 17, 'DEF-base': 3, 'STR-base': 3, 'LUK-base': 0, 'RES-base': 0, 'SKL-base': 3}, 'Wyvern Knight': {'class': 'Wyvern Knight', 'SPD-base': 8, 'HP-base': 20, 'DEF-base': 7, 'STR-base': 7, 'LUK-base': 0, 'RES-base': 1, 'SKL-base': 7}, 'Entombed': {'class': 'Entombed', 'SPD-base': 1, 'HP-base': 35, 'DEF-base': 0, 'STR-base': 3, 'LUK-base': 0, 'RES-base': 0, 'SKL-base': 0}, 'Druid (F)': {'class': 'Druid (F)', 'SPD-base': 4, 'HP-base': 17, 'DEF-base': 3, 'STR-base': 7, 'LUK-base': 0, 'RES-base': 7, 'SKL-base': 3}, 'Berserker': {'class': 'Berserker', 'SPD-base': 7, 'HP-base': 24, 'DEF-base': 6, 'STR-base': 7, 'LUK-base': 0, 'RES-base': 0, 'SKL-base': 6}, 'Knight (F)': {'class': 'Knight (F)', 'SPD-base': 1, 'HP-base': 16, 'DEF-base': 8, 'STR-base': 4, 'LUK-base': 0, 'RES-base': 1, 'SKL-base': 3}, 'Warrior': {'class': 'Warrior', 'SPD-base': 6, 'HP-base': 28, 'DEF-base': 5, 'STR-base': 8, 'LUK-base': 0, 'RES-base': 0, 'SKL-base': 5}, 'Assassin': {'class': 'Assassin', 'SPD-base': 9, 'HP-base': 16, 'DEF-base': 2, 'STR-base': 3, 'LUK-base': 0, 'RES-base': 0, 'SKL-base': 1}, 'Necromancer': {'class': 'Necromancer', 'SPD-base': 5, 'HP-base': 18, 'DEF-base': 3, 'STR-base': 9, 'LUK-base': 0, 'RES-base': 8, 'SKL-base': 4}, 'Sage (F)': {'class': 'Sage (F)', 'SPD-base': 5, 'HP-base': 19, 'DEF-base': 3, 'STR-base': 4, 'LUK-base': 0, 'RES-base': 6, 'SKL-base': 6}, 'Knight': {'class': 'Knight', 'SPD-base': 0, 'HP-base': 17, 'DEF-base': 9,'STR-base': 5, 'LUK-base': 0, 'RES-base': 0, 'SKL-base': 2}, 'Mage': {'class': 'Mage', 'SPD-base': 3, 'HP-base': 16, 'DEF-base': 3, 'STR-base': 1, 'LUK-base': 0, 'RES-base': 3, 'SKL-base': 2}, 'Druid': {'class': 'Druid', 'SPD-base': 4, 'HP-base': 19, 'DEF-base': 4, 'STR-base': 6, 'LUK-base': 0, 'RES-base': 6, 'SKL-base': 3}, 'Myrmidon (F)': {'class': 'Myrmidon (F)', 'SPD-base': 10, 'HP-base': 15, 'DEF-base': 1, 'STR-base': 3, 'LUK-base': 0, 'RES-base': 1, 'SKL-base': 9}, 'Cleric': {'class': 'Cleric', 'SPD-base': 2, 'HP-base': 16, 'DEF-base': 0, 'STR-base': 1, 'LUK-base': 0, 'RES-base': 6, 'SKL-base': 2}, 'Arch Mogall': {'class': 'Arch Mogall', 'SPD-base': 3, 'HP-base': 17, 'DEF-base': 3, 'STR-base': 6, 'LUK-base': 0, 'RES-base': 7, 'SKL-base': 3}, 'Deathgoyle': {'class': 'Deathgoyle', 'SPD-base': 8, 'HP-base': 23, 'DEF-base': 9, 'STR-base': 8, 'LUK-base': 0, 'RES-base': 1, 'SKL-base': 5}, 'Mogall': {'class': 'Mogall', 'SPD-base': 2, 'HP-base': 15, 'DEF-base': 2, 'STR-base': 2, 'LUK-base': 0, 'RES-base': 4, 'SKL-base': 1}}
-
 def getHexFromClass(name):
     try:
         if name not in CLASS_TO_HEX.keys():
@@ -180,18 +184,12 @@ def getHexFromClass(name):
     except:
         return None
         
-def getClassBases(c):
-    if c in CLASS_BASES:
-        return CLASS_BASES[c]
-    elif c in CLASS_TO_CLASS:
-        return CLASS_BASES[CLASS_TO_CLASS[c]]
-    else:
-        for real in CLASS_TO_HEX:
-            if  CLASS_TO_HEX[real] == c:
-                return CLASS_BASES[real]
-    print(c)
-    return None
-        
+def getClassAddress(name):
+    try:
+        return CLASS_TABLE + getHexFromClass(name) * CLASS_ENTRY_LENGTH
+    except:
+        return None
+    
 ITEM_TO_HEX = {
     '' : 0x00,
     'Iron Sword' : 0x01,
@@ -378,6 +376,20 @@ ITEM_TO_ITEM = {
     'Dragon Spirit' : 'Fimbulvetr',
 }
 
+WR_TO_HEX = {
+    '' : 0x00,
+    'E' : 0x01,
+    'D' : 0x1F,
+    'C' : 0x47,
+    'B' : 0x79,
+    'A' : 0xB5,
+    'S' : 0xFB
+}
+
+WEAPON_TYPES = [
+    "Sword", "Lance", "Axe", "Bow", "Staff", "Anima", "Light", "Dark"
+]
+
 def getHexFromItem(name):
     try:
         if name not in ITEM_TO_HEX.keys():
@@ -386,13 +398,20 @@ def getHexFromItem(name):
     except:
         return None
 
+def getHexFromWeaponRank(rank):
+    try:
+        return WR_TO_HEX[rank]
+    except:
+        return None
+
 def convertCharacter(oldChar):
     newChar = {}
     for key in oldChar:
         if (key == 'class'):
-            newChar[key] = getHexFromClass(oldChar[key]);
+            newChar['class name'] = oldChar[key]
+            newChar[key] = getHexFromClass(oldChar[key])
         elif (key == 'character'):
-            newChar[key] = getHexFromChar(oldChar[key]);
+            newChar[key] = getHexFromChar(oldChar[key])
         elif (key == "items"):
             newChar[key] = []
             for i in range(4):
@@ -400,6 +419,8 @@ def convertCharacter(oldChar):
                     newChar[key].append(getHexFromItem(oldChar[key][i]))
                 else:
                     newChar[key].append(0)
+        elif key in WEAPON_TYPES:
+            newChar[key] = getHexFromWeaponRank(oldChar[key])
         else:
             newChar[key] = oldChar[key]
     return newChar

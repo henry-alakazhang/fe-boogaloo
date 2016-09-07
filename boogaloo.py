@@ -46,7 +46,8 @@ for char in CHAR_DATA[ver]:
     replace[char] = charlist.pop()
 
 data.rescaleStats(replace, averages, ver)
-    
+CLASS_DATA = {} # populated as needed from the game itself
+
 for char in replace.keys():
     oldChar = rom.getCharData(GAME_DATA, GAME_FILE, char)
     replace[char] = GAME_DATA.convertCharacter(replace[char])
@@ -56,7 +57,10 @@ for char in replace.keys():
             # different stat insertion formula for base stats
             if stat.endswith('base'):
                 print (stat, ":", CHAR_DATA[ver][char][stat], "->", replace[char][stat])
-                oldChar[stat] = int(replace[char][stat]) - GAME_DATA.getClassBases(replace[char]['class'])[stat]
+                # load class data from ROM and cache it in CLASS_DATA
+                if (replace[char]['class name'] not in CLASS_DATA.keys()):
+                    CLASS_DATA[replace[char]['class name']] = rom.getClassData(GAME_DATA, GAME_FILE, replace[char]['class name'])
+                oldChar[stat] = int(replace[char][stat]) - CLASS_DATA[replace[char]['class name']][stat]
             else:
                 oldChar[stat] = int(replace[char][stat])
         if stat == 'items':

@@ -1,3 +1,6 @@
+# module for reading and writing data to a rom
+# i should have made this a class and attached the file to this...
+
 import codecs, struct, re
 
 CHAR_FORMAT = [
@@ -11,7 +14,12 @@ CHAR_UNIT_FORMAT = [
     "Char", "class", "X1", "Levels", "X", "Y", "X2", "X3", "Ref1", "Ref2", "Ref3", "Ref4",
     "Item 1", "Item 2", "Item 3", "Item 4"
 ]
-    
+
+CLASS_FORMAT = [
+    "Name_HI", "Name_LO", "Desc_HI", "Desc_LO", "C No", "Promo", "Sprite", "Walk", "Portrait", "X1", "X2",
+    "HP-base", "STR-base", "SKL-base", "SPD-base", "DEF-base", "RES-base", "CON-base"
+]
+
 def getCharData(ver, file, name):
     charData = {}
     # load character stats
@@ -48,3 +56,14 @@ def setCharData(ver, file, name, new):
                 file.write(new[s].to_bytes(1, byteorder='little', signed=False))
             else:
                 file.seek(1, 1)
+                
+def getClassData(ver, file, name):
+    classData = {}
+    file.seek(ver.getClassAddress(name))
+    for s in CLASS_FORMAT:
+        if re.search('base', s) != None:
+            classData[s] = int.from_bytes(file.read(1), byteorder='little', signed=True)
+        else:
+            classData[s] = int.from_bytes(file.read(1), byteorder='little', signed=False)
+    classData['LUK-base'] = 0
+    return classData

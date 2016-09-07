@@ -1,3 +1,6 @@
+# module for doing all the mathy stuff
+# like calculating average stats, rescaling based on averages and such
+
 import statistics, csv, random, re
 import fe8
 
@@ -69,8 +72,6 @@ def parseDataFile(filename):
     charreader = csv.DictReader(charfile, heads, "items")
     for line in charreader:
         data[line['game']][line['name']] = line
-        if line['name'] == "Beruka":
-            print(line)
     charfile.close()
     
     return data
