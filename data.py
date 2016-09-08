@@ -65,6 +65,7 @@ def statDiffsOk(char1, char2):
     if abs(int(char1['level']) - int(char2['level'])) < 3:
         return True
     '''
+    
     # if in general too different
     if abs(sum(diffs['abs'].values())) > 10 and abs(1-statistics.mean(diffs['rel'].values())) > 0.3:
         return False

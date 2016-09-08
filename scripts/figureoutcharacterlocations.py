@@ -22,7 +22,6 @@ for filename in os.listdir("./nmms"):
             for c in charsCopy:
                 if charsCopy[c] == charID:
                     unitAddresses[c] += [addr+i*fe8.CHAR_UNIT_LENGTH]
-                    charsCopy.pop(c)
                     break
             GAME.seek(fe8.CHAR_UNIT_LENGTH - 1, 1)
             
