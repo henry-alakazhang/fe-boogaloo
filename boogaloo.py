@@ -40,10 +40,7 @@ CHAR_DATA = data.parseDataFile('chardata.csv')
 print("Beginning BOOGALOOFICATION")
 
 averages = data.calculateAverages(CHAR_DATA)
-charlist = data.getRandomCharacters(CHAR_DATA, ver)
-replace = {}
-for char in CHAR_DATA[ver]:
-    replace[char] = charlist.pop()
+replace = data.getRandomCharacters(CHAR_DATA, ver)
 
 data.rescaleStats(replace, averages, ver)
 CLASS_DATA = {} # populated as needed from the game itself
@@ -56,7 +53,7 @@ for char in replace.keys():
         if stat in oldChar:
             # different stat insertion formula for base stats
             if stat.endswith('base'):
-                print (stat, ":", CHAR_DATA[ver][char][stat], "->", replace[char][stat])
+#                print (stat, ":", CHAR_DATA[ver][char][stat], "->", replace[char][stat])
                 # load class data from ROM and cache it in CLASS_DATA
                 if (replace[char]['class name'] not in CLASS_DATA.keys()):
                     CLASS_DATA[replace[char]['class name']] = rom.getClassData(GAME_DATA, GAME_FILE, replace[char]['class name'])
