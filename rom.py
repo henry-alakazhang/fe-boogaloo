@@ -3,8 +3,11 @@
 
 import codecs, struct, re
 
+# can i just say, why the hell does the nightmare module have an arbitrarily SKIPPED
+# byte instead of just calling it UNKNOWN like everything else that's UNKNOWN?
+# #salty
 CHAR_FORMAT = [
-    "Name_HI", "Name_LO", "Desc", "Char #", "Standing Class", "Portrait", "X1", "Mini", "Affinity", "X2",
+    "Name_LO", "Name_HI", "Desc", "SKIPPED", "Char #", "class", "Portrait", "X1", "Mini", "Affinity", "X2",
     "LevelN", "HP-base", "STR-base", "SKL-base", "SPD-base", "DEF-base", "RES-base", "LUK-base",
     "CON-base", "Sword", "Lance", "Axe", "Bow", "Staff", "Anima", "Light", "Dark",
     "HP-grow", "STR-grow", "SKL-grow", "SPD-grow", "DEF-grow", "RES-grow", "LUK-grow"
@@ -33,6 +36,8 @@ def writeTextToROM(file, ver, index, string):
     tablePtr = ver.getTextTable(file)
     tablePtr += (index[0] * 0x100 + index[1])*4
     
+#    print("Name", string, "being written to", hex(index[0]), hex(index[1]))
+    
     # append text to end of ROM
     file.seek(0, 2)
     newPtr = file.tell() + 0x88000000
@@ -41,8 +46,6 @@ def writeTextToROM(file, ver, index, string):
     while len(string) % 4 != 0:
         string += "\0"
     file.write(string.encode('UTF-8'));
-    
-    print(hex(tablePtr), hex(newPtr))
     
     # update text pointer table
     writeBytes(file, newPtr, 4, tablePtr)
@@ -88,6 +91,8 @@ def setCharData(file, ver, name, new):
                 file.write(new[s].to_bytes(1, byteorder='little', signed=False))
             else:
                 file.seek(1, 1)
+    writeTextToROM(file, ver, [new['Name_HI'], new['Name_LO']], new['name'])
+    
                 
 def getClassData(file, ver, name):
     classData = {}
@@ -106,7 +111,6 @@ def convertCharacter(game, oldChar):
         if (key == 'class'):
             newChar['class name'] = oldChar[key]
             newChar[key] = game.getHexFromClass(oldChar[key])
-            print("New class: ", newChar['class name'])
         elif (key == 'character'):
             newChar[key] = game.getHexFromChar(oldChar[key])
         elif (key == "items"):
@@ -114,8 +118,9 @@ def convertCharacter(game, oldChar):
             for i in range(4):
                 if game.getHexFromItem(oldChar[key][i]) != None:
                     newChar[key].append(game.getHexFromItem(oldChar[key][i]))
-                else:
-                    newChar[key].append(0)
+            # fill in remaining item slots to avoid out of bounds
+            while (len(newChar[key]) < 4):
+                newChar[key].append(0)
         elif key in game.WEAPON_TYPES:
             newChar[key] = game.getHexFromWeaponRank(oldChar[key])
         else:

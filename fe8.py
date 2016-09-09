@@ -67,7 +67,7 @@ def getHexFromChar(name):
 
 def getCharacterAddress(name):
     try:
-        return CHAR_TABLE + getHexFromChar(name) * CHAR_ENTRY_LENGTH + 1
+        return CHAR_TABLE + getHexFromChar(name) * CHAR_ENTRY_LENGTH
     except:
         return None
         
@@ -374,7 +374,7 @@ ITEM_TO_ITEM = {
     'Concoction' : 'Vulnerary',
     'Wind' : 'Fire',
     'Elthunder' : 'Thunder',
-    'Elwind' : 'Thunder',
+    'Elwind' : 'Aircalibur',
     'Bolganone' : 'Elfire',
     'Thoron' : 'Elfire',
     'Meteor' : 'Bolting',
@@ -386,6 +386,7 @@ ITEM_TO_ITEM = {
     'Sheep Spirit' : 'Thunder',
     'Tiger Spirit' : 'Elfire',
     'Dragon Spirit' : 'Fimbulvetr',
+    'Excalibur' : 'Aircalibur',
 }
 
 WR_TO_HEX = {
@@ -404,7 +405,7 @@ WEAPON_TYPES = [
 
 def getHexFromItem(name):
     try:
-        if name not in ITEM_TO_HEX.keys():
+        if name in ITEM_TO_ITEM.keys():
             print("Item", name, "changed to", ITEM_TO_HEX[name])
             name = ITEM_TO_ITEM[name]
         return ITEM_TO_HEX[name]

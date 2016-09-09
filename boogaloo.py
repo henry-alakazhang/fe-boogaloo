@@ -35,6 +35,7 @@ print("Setting up data...")
 GAME_DATA = fe8 if ver == "FE8" else (fe7 if ver == "FE7" else fe6)
 CHAR_DATA = data.parseDataFile('chardata.csv')
 rom.applyPatch(GAME_FILE, GAME_DATA.ANTIHUFFMAN)
+print("Text table found at", hex(GAME_DATA.getTextTable(GAME_FILE)))
 
 ############################
 # GET BOOGALOO!
@@ -46,10 +47,10 @@ replace = data.getRandomCharacters(CHAR_DATA, ver)
 data.rescaleStats(replace, averages, ver)
 CLASS_DATA = {} # populated as needed from the game itself
 
-sys.stdout = open("boogalog.txt")
+#sys.stdout = open("boogalog.txt", 'w')
 for char in replace.keys():
     oldChar = rom.getCharData(GAME_FILE, GAME_DATA, char)
-    replace[char] = rom.convertCharacter(replace[char])
+    replace[char] = rom.convertCharacter(GAME_DATA, replace[char])
     print (char, "->", replace[char]['name'])
     for stat in replace[char]:
         if stat in oldChar:
@@ -62,8 +63,10 @@ for char in replace.keys():
                 oldChar[stat] = int(replace[char][stat]) - CLASS_DATA[replace[char]['class name']][stat]
             else:
                 oldChar[stat] = int(replace[char][stat])
-        if stat == 'items':
+        elif stat == 'items':
             for i in range(4):
 #                print(oldChar['Item ' + str(i+1)], "->", replace[char]['items'][i])
                 oldChar['Item ' + str(i+1)] = replace[char]['items'][i]
+        else:
+            oldChar[stat] = replace[char][stat]
     rom.setCharData(GAME_FILE, GAME_DATA, char, oldChar)
