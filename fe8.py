@@ -376,6 +376,9 @@ ITEM_TO_ITEM = {
     'Wind' : 'Fire',
     'Elthunder' : 'Thunder',
     'Elwind' : 'Aircalibur',
+    'Arcfire' : 'Fimbulvetr',
+    'Arcthunder' : 'Fimbulvetr',
+    'Arcwind' : 'Aircalibur',
     'Bolganone' : 'Elfire',
     'Thoron' : 'Elfire',
     'Meteor' : 'Bolting',
@@ -387,7 +390,7 @@ ITEM_TO_ITEM = {
     'Sheep Spirit' : 'Thunder',
     'Tiger Spirit' : 'Elfire',
     'Dragon Spirit' : 'Fimbulvetr',
-    'Excalibur' : 'Aircalibur'
+    'Excalibur' : 'Aircalibur',
 }
 
 WR_TO_HEX = {
