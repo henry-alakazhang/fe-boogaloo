@@ -20,7 +20,39 @@ CLASS_FORMAT = [
     "HP-base", "STR-base", "SKL-base", "SPD-base", "DEF-base", "RES-base", "CON-base"
 ]
 
-def getCharData(ver, file, name):
+def readBytes(file, len, ptr, sign=False):
+    file.seek(ptr)
+    return int.from_bytes(file.read(len), byteorder='little', signed=sign);
+    
+def writeBytes(file, words, len, ptr, sign=False):
+    file.seek(ptr)
+    file.write(words.to_bytes(len, byteorder='little', signed=sign));
+
+def writeTextToROM(file, ver, index, string):
+    # get location of text pointer table
+    tablePtr = ver.getTextTable(file)
+    tablePtr += (index[0] * 0x100 + index[1])*4
+    
+    # append text to end of ROM
+    file.seek(0, 2)
+    newPtr = file.tell() + 0x88000000
+    string += "\0"
+    # add padding bytes
+    while len(string) % 4 != 0:
+        string += "\0"
+    file.write(string.encode('UTF-8'));
+    
+    print(hex(tablePtr), hex(newPtr))
+    
+    # update text pointer table
+    writeBytes(file, newPtr, 4, tablePtr)
+
+# applies a dict patch with {ptr : byte} mappings    
+def applyPatch(file, patch):
+    for addr in patch:
+        writeBytes(file, patch[addr], 1, addr)
+    
+def getCharData(file, ver, name):
     charData = {}
     # load character stats
     file.seek(ver.getCharacterAddress(name))
@@ -36,7 +68,7 @@ def getCharData(ver, file, name):
         charData[s] = int.from_bytes(file.read(1), byteorder='little', signed=False)
     return charData
     
-def setCharData(ver, file, name, new):
+def setCharData(file, ver, name, new):
     # store characer stats
     file.seek(ver.getCharacterAddress(name))
     for s in CHAR_FORMAT:
@@ -57,7 +89,7 @@ def setCharData(ver, file, name, new):
             else:
                 file.seek(1, 1)
                 
-def getClassData(ver, file, name):
+def getClassData(file, ver, name):
     classData = {}
     file.seek(ver.getClassAddress(name))
     for s in CLASS_FORMAT:
@@ -67,3 +99,25 @@ def getClassData(ver, file, name):
             classData[s] = int.from_bytes(file.read(1), byteorder='little', signed=False)
     classData['LUK-base'] = 0
     return classData
+    
+def convertCharacter(game, oldChar):
+    newChar = {}
+    for key in oldChar:
+        if (key == 'class'):
+            newChar['class name'] = oldChar[key]
+            newChar[key] = game.getHexFromClass(oldChar[key])
+            print("New class: ", newChar['class name'])
+        elif (key == 'character'):
+            newChar[key] = game.getHexFromChar(oldChar[key])
+        elif (key == "items"):
+            newChar[key] = []
+            for i in range(4):
+                if game.getHexFromItem(oldChar[key][i]) != None:
+                    newChar[key].append(game.getHexFromItem(oldChar[key][i]))
+                else:
+                    newChar[key].append(0)
+        elif key in game.WEAPON_TYPES:
+            newChar[key] = game.getHexFromWeaponRank(oldChar[key])
+        else:
+            newChar[key] = oldChar[key]
+    return newChar

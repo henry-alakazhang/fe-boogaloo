@@ -8,6 +8,18 @@ CHAR_UNIT_LENGTH = 20
 CLASS_TABLE = 0x807110
 CLASS_ENTRY_LENGTH = 84
 
+TEXT_TABLE_INDIRECT = 0x00A2A0
+TEXT_TABLE = None
+
+# dynamically load text table
+def getTextTable(file):
+    try:
+        return TEXT_TABLE
+    except:
+        file.seek(TEXT_TABLE_INDIRECT)
+        TEXT_TABLE = int.from_bytes(file.read(4), byteorder='little', signed=False) - 0x8000000 
+        return TEXT_TABLE
+    
 CHAR_TO_HEX = {
     'Eirika' : 0x01, 
     'Seth' : 0x02, 
@@ -393,6 +405,7 @@ WEAPON_TYPES = [
 def getHexFromItem(name):
     try:
         if name not in ITEM_TO_HEX.keys():
+            print("Item", name, "changed to", ITEM_TO_HEX[name])
             name = ITEM_TO_ITEM[name]
         return ITEM_TO_HEX[name]
     except:
@@ -403,29 +416,11 @@ def getHexFromWeaponRank(rank):
         return WR_TO_HEX[rank]
     except:
         return None
-
-def convertCharacter(oldChar):
-    newChar = {}
-    for key in oldChar:
-        if (key == 'class'):
-            newChar['class name'] = oldChar[key]
-            newChar[key] = getHexFromClass(oldChar[key])
-        elif (key == 'character'):
-            newChar[key] = getHexFromChar(oldChar[key])
-        elif (key == "items"):
-            newChar[key] = []
-            for i in range(4):
-                if getHexFromItem(oldChar[key][i]) != None:
-                    newChar[key].append(getHexFromItem(oldChar[key][i]))
-                else:
-                    newChar[key].append(0)
-        elif key in WEAPON_TYPES:
-            newChar[key] = getHexFromWeaponRank(oldChar[key])
-        else:
-            newChar[key] = oldChar[key]
-    return newChar
     
 # if the class exists, the character is legal.
 # even if they have illegal items - those are just removed
 def legalCharacter(char):
     return getHexFromClass(char['class']) != None
+
+# generated this one with a script too lol
+ANTIHUFFMAN = {896875: 49, 1432790: 0, 896876: 1, 1432791: 137, 896877: 48, 896871: 120, 896879: 42, 896869: 26, 896881: 209, 1432788: 0, 896872: 10, 896870: 2, 896868: 192,896864: 128, 41538: 4, 41540: 10, 41541: 77, 41542: 40, 896865: 35, 41544: 132,41546: 15, 41548: 9, 896866: 27, 41550: 160, 896873: 112, 896867: 6, 41556: 8, 41557: 73, 41558: 0, 41559: 40, 41560: 2, 41561: 220, 41562: 208, 41563: 240, 41564: 129, 41565: 254, 41566: 4, 41567: 224, 41568: 248, 41569: 247, 41570: 160, 41571: 252, 41572: 4, 41573: 72, 41574: 255, 41575: 247, 41576: 175, 41577: 255,41578: 44, 41579: 96, 41580: 2, 41581: 72, 41582: 112, 41583: 189, 896880: 249,41585: 182, 896882: 112, 896883: 71, 41588: 140, 41589: 212, 41590: 21, 41591: 8, 41592: 172, 41593: 166, 41594: 2, 41595: 2, 896874: 1, 1432789: 0}

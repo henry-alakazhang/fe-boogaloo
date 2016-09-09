@@ -5,7 +5,7 @@ import data, rom, fe8
 
 # figure out which game we're trying to edit
 ver  = "?"
-GAME_FILE = open(sys.argv[1], 'rb+')
+GAME_FILE = open(sys.argv[len(sys.argv) - 1], 'rb+')
 GAME_FILE.seek(0xAA)
 gameCode = GAME_FILE.read(6).decode('UTF-8')
 if gameCode == "E.AE7E" :
@@ -34,6 +34,7 @@ print("Setting up data...")
 # It sets GAME_DATA to a different MODULE based on input.
 GAME_DATA = fe8 if ver == "FE8" else (fe7 if ver == "FE7" else fe6)
 CHAR_DATA = data.parseDataFile('chardata.csv')
+rom.applyPatch(GAME_FILE, GAME_DATA.ANTIHUFFMAN)
 
 ############################
 # GET BOOGALOO!
@@ -45,9 +46,10 @@ replace = data.getRandomCharacters(CHAR_DATA, ver)
 data.rescaleStats(replace, averages, ver)
 CLASS_DATA = {} # populated as needed from the game itself
 
+sys.stdout = open("boogalog.txt")
 for char in replace.keys():
-    oldChar = rom.getCharData(GAME_DATA, GAME_FILE, char)
-    replace[char] = GAME_DATA.convertCharacter(replace[char])
+    oldChar = rom.getCharData(GAME_FILE, GAME_DATA, char)
+    replace[char] = rom.convertCharacter(replace[char])
     print (char, "->", replace[char]['name'])
     for stat in replace[char]:
         if stat in oldChar:
@@ -56,7 +58,7 @@ for char in replace.keys():
 #                print (stat, ":", CHAR_DATA[ver][char][stat], "->", replace[char][stat])
                 # load class data from ROM and cache it in CLASS_DATA
                 if (replace[char]['class name'] not in CLASS_DATA.keys()):
-                    CLASS_DATA[replace[char]['class name']] = rom.getClassData(GAME_DATA, GAME_FILE, replace[char]['class name'])
+                    CLASS_DATA[replace[char]['class name']] = rom.getClassData(GAME_FILE, GAME_DATA, replace[char]['class name'])
                 oldChar[stat] = int(replace[char][stat]) - CLASS_DATA[replace[char]['class name']][stat]
             else:
                 oldChar[stat] = int(replace[char][stat])
@@ -64,5 +66,4 @@ for char in replace.keys():
             for i in range(4):
 #                print(oldChar['Item ' + str(i+1)], "->", replace[char]['items'][i])
                 oldChar['Item ' + str(i+1)] = replace[char]['items'][i]
-                
-    rom.setCharData(GAME_DATA, GAME_FILE, char, oldChar)
+    rom.setCharData(GAME_FILE, GAME_DATA, char, oldChar)
