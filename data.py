@@ -59,12 +59,9 @@ def statDiffsOk(char1, char2):
             s2 = int(char2[stat])
             diffs['rel'][stat] = (s1/s2 if (s2 != 0) else s1)
             diffs['abs'][stat] = s1 - s2
-    '''
-    # TODO: level diff (requires "effective level" in chardata.csv, or at least some way to calculate it)
     # if characters are close in level, just throw em in
     if abs(int(char1['level']) - int(char2['level'])) < 3:
         return True
-    '''
     
     # if in general too different
     if abs(sum(diffs['abs'].values())) > 10 and abs(1-statistics.mean(diffs['rel'].values())) > 0.3:
