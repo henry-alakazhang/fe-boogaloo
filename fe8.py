@@ -186,12 +186,13 @@ CLASS_TO_CLASS = {
     'Villager' : 'Recruit',
     'Dark Sage' : 'Druid',
     'Dark Knight' : 'Mage Knight',
+    'Manakete' : 'Manakete (F)'
 }
 
 def getHexFromClass(name):
     try:
-        if name not in CLASS_TO_HEX.keys():
-            name = CLASS_TO_CLASS[name]
+        if name in CLASS_TO_CLASS:
+            return CLASS_TO_HEX[CLASS_TO_CLASS[name]]
         return CLASS_TO_HEX[name]
     except:
         return None
@@ -386,7 +387,7 @@ ITEM_TO_ITEM = {
     'Sheep Spirit' : 'Thunder',
     'Tiger Spirit' : 'Elfire',
     'Dragon Spirit' : 'Fimbulvetr',
-    'Excalibur' : 'Aircalibur',
+    'Excalibur' : 'Aircalibur'
 }
 
 WR_TO_HEX = {
@@ -405,11 +406,12 @@ WEAPON_TYPES = [
 
 def getHexFromItem(name):
     try:
-        if name in ITEM_TO_ITEM.keys():
-            print("Item", name, "changed to", ITEM_TO_HEX[name])
-            name = ITEM_TO_ITEM[name]
+        if name in ITEM_TO_ITEM:
+            print("Item", name, "changed to", ITEM_TO_ITEM[name])
+            return  ITEM_TO_HEX[ITEM_TO_ITEM[name]]
         return ITEM_TO_HEX[name]
     except:
+        print("Illegal item", name, "removed")
         return None
 
 def getHexFromWeaponRank(rank):

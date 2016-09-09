@@ -116,8 +116,9 @@ def convertCharacter(game, oldChar):
         elif (key == "items"):
             newChar[key] = []
             for i in range(4):
-                if game.getHexFromItem(oldChar[key][i]) != None:
-                    newChar[key].append(game.getHexFromItem(oldChar[key][i]))
+                newName = game.getHexFromItem(oldChar[key][i])
+                if newName != None:
+                    newChar[key].append(newName)
             # fill in remaining item slots to avoid out of bounds
             while (len(newChar[key]) < 4):
                 newChar[key].append(0)
