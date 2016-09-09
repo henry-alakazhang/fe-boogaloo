@@ -186,11 +186,12 @@ CLASS_TO_CLASS = {
     'Villager' : 'Recruit',
     'Dark Sage' : 'Druid',
     'Dark Knight' : 'Mage Knight',
+    'Manakete' : 'Manakete (F)'
 }
 
 def getHexFromClass(name):
     try:
-        if name not in CLASS_TO_HEX.keys():
+        if name in CLASS_TO_CLASS.keys():
             name = CLASS_TO_CLASS[name]
         return CLASS_TO_HEX[name]
     except:
@@ -406,7 +407,6 @@ WEAPON_TYPES = [
 def getHexFromItem(name):
     try:
         if name in ITEM_TO_ITEM.keys():
-            print("Item", name, "changed to", ITEM_TO_HEX[name])
             name = ITEM_TO_ITEM[name]
         return ITEM_TO_HEX[name]
     except:

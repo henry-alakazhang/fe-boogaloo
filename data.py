@@ -60,11 +60,12 @@ def statDiffsOk(char1, char2):
             diffs['rel'][stat] = (s1/s2 if (s2 != 0) else s1)
             diffs['abs'][stat] = s1 - s2
     # if characters are close in level, just throw em in
-    if abs(int(char1['level']) - int(char2['level'])) < 3:
-        return True
+    # temporarily removed due to questionable balance
+#    if abs(int(char1['level']) - int(char2['level'])) < 2:
+#        return True
     
-    # if in general too different
-    if abs(sum(diffs['abs'].values())) > 10 and abs(1-statistics.mean(diffs['rel'].values())) > 0.3:
+    # if in general too different (avg. 2+)
+    if abs(sum(diffs['abs'].values())) > 6 and abs(1-statistics.mean(diffs['rel'].values())) > 0.3:
         return False
     
     # if absolutely too much better (avg. 5 per combat stat)
