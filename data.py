@@ -43,12 +43,13 @@ def statDiffsOk(char1, char2):
 #    if abs(int(char1['level']) - int(char2['level'])) < 3:
 #        return True
     
-    # if in general too different
-    if abs(sum(diffs['abs'].values())) > 7 and abs(1-statistics.mean(diffs['rel'].values())) > 0.3:
+    # if in general too different 
+    if abs(sum(diffs['abs'].values())) > 5 and abs(1-statistics.mean(diffs['rel'].values())) > 0.2:
         return False
     
-    # if absolutely too much better (avg. 5 per combat stat)
-    if abs(sum(diffs['abs'].values())) > 20 or abs(max(diffs['abs'].values())) > 10:
+    # if absolutely too much better (avg. 2+ per combat stat)
+    # or just crazy better in a single stat
+    if abs(sum(diffs['abs'].values())) > 10 or abs(max(diffs['abs'].values())) > 10:
         return False
         
     # if most stats are more than double
