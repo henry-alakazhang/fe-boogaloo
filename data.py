@@ -2,7 +2,6 @@
 # like calculating average stats, rescaling based on averages and such
 
 import statistics, csv, random, re
-import fe8
 
 # returns a list of 'num' random characters
 # to replace characters in the given game

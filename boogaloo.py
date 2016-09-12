@@ -1,7 +1,9 @@
 import sys, re
 
 # my modules
-import data, rom, fe8
+import data
+
+# my classes
 from rom import Rom
 from fe8 import FE8
 
@@ -31,16 +33,20 @@ print("Game detected as", ver)
 ############################
 # parse data files
 print("Setting up data...")
-
 game = FE8(GAME_FILE) #if ver == "FE8" else (fe7() if ver == "FE7" else fe6())
-CHAR_DATA = data.parseDataFile('chardata.csv')
+
+print("Applying Anti-Huffman patch.")
 game.applyPatch(game.ANTIHUFFMAN)
 print("Text table found at", hex(game.getTextTable()))
 
+print("Opening Outrealms portals... ")
+CHAR_DATA = data.parseDataFile('chardata.csv')
+
 ############################
 # GET BOOGALOO!
-print("Beginning BOOGALOOFICATION")
+print("Beginning BOOGALOOFICATION!")
 
+# get new characters
 averages = data.calculateAverages(CHAR_DATA)
 replace = data.getRandomCharacters(game, CHAR_DATA)
 
@@ -48,10 +54,11 @@ data.rescaleStats(replace, averages, ver)
 CLASS_DATA = {} # populated as needed from the game itself
 
 #sys.stdout = open("boogalog.txt", 'w')
+# insert characters over old ones
 for char in replace.keys():
     oldChar = game.getCharData(char)
     replace[char] = game.convertCharacter(replace[char])
-    print (char, "->", replace[char]['name'])
+#    print (char, "->", replace[char]['name'])
     for stat in replace[char]:
         if stat in oldChar:
             # different stat insertion formula for base stats
@@ -70,3 +77,6 @@ for char in replace.keys():
         else:
             oldChar[stat] = replace[char][stat]
     game.setCharData(char, oldChar)
+    
+print("Outrealms Boogaloo completed!")
+GAME_FILE.close();

@@ -25,15 +25,24 @@ class Rom(object):
     
     def __init__(self, file):
         self.file = file
-
+    
+    '''
+    ## general-use file functions ##
+    '''
+    
+    # reads (len) bytes from the address at (ptr) from the ROM file
     def readBytes(self, len, ptr, sign=False):
         self.file.seek(ptr)
         return int.from_bytes(self.file.read(len), byteorder='little', signed=sign);
         
+    # writes (words) bytes with (len) to the address at (ptr) in the ROM
+    # have to take 'len' because sizeof() is questionable in Python
     def writeBytes(self, words, len, ptr, sign=False):
         self.file.seek(ptr)
         self.file.write(words.to_bytes(len, byteorder='little', signed=sign));
 
+    # replaces the text at (index) with (string)
+    # please make sure the index is actually in the ROM. undefined behaviour otherwise.
     def writeTextToROM(self, index, string):
         # get location of text pointer table
         tablePtr = self.getTextTable()
@@ -57,7 +66,8 @@ class Rom(object):
     def applyPatch(self, patch):
         for addr in patch:
             self.writeBytes(patch[addr], 1, addr)
-        
+    
+    # loads character data of (name) into a dict with keys in CHAR_FORMAT + CHAR_UNIT_FORMAT
     def getCharData(self, name):
         charData = {}
         # load character stats
@@ -74,6 +84,8 @@ class Rom(object):
             charData[s] = int.from_bytes(self.file.read(1), byteorder='little', signed=False)
         return charData
         
+    # sets character data of (name) with (new)
+    # (new) is expected to be the same format as getCharData
     def setCharData(self, name, new):
         # store characer stats
         self.file.seek(self.getCharacterAddress(name))
@@ -96,7 +108,7 @@ class Rom(object):
                     self.file.seek(1, 1)
         self.writeTextToROM([new['Name_HI'], new['Name_LO']], new['name'])
         
-                    
+    # returns data of class (name) as a dict with keys CLASS_FORMAT
     def getClassData(self, name):
         classData = {}
         self.file.seek(self.getClassAddress(name))
@@ -108,6 +120,7 @@ class Rom(object):
         classData['LUK-base'] = 0
         return classData
         
+    # returns a new character of (oldChar)'s format, but with names replaced by game-specific values.
     def convertCharacter(self, oldChar):
         newChar = {}
         for key in oldChar:
@@ -130,9 +143,28 @@ class Rom(object):
             else:
                 newChar[key] = oldChar[key]
         return newChar
-        
-    ## individual ROM characteristic functions ##
     
+    '''
+    ## individual ROM characteristic functions ##
+    '''
+    
+    # returns whether a character is legal to be boogaloo'd
+    # ideally this always returns true but atm there are some limits
+    # mostly nonexistent classes with no equivalent
+    # eg.
+    #   * Beast shapeshifters (eg. Laguz, Taguel)
+    #       * TODO: make them compatible with FE8 as Hellhounds
+    #   * Bird shapeshifters (eg. Ravens, Herons)
+    #       * I guess i could make herons = dancers
+    #   * Lords
+    #       * TODO: make lords replacing lords ok
+    #       * requires editing Prf weapons
+    #   * GBA classes with weird weapons (eg. Axe Knight/Cav/Wyvern, Sword Peg)
+    #       * I mean these are technically possible, I just need to fix chardata.csv
+    
+    def legalCharacter(self, char):
+        return self.getHexFromClass(char['class']) != None
+        
     # dynamically load text table address
     def getTextTable(self):
         try:
@@ -141,7 +173,7 @@ class Rom(object):
             self.file.seek(self.TEXT_TABLE_INDIRECT)
             self.TEXT_TABLE = int.from_bytes(self.file.read(4), byteorder='little', signed=False) - 0x8000000 
             return self.TEXT_TABLE
-            
+    
     def getHexFromChar(self, name):
         try:
             return self.CHAR_TO_HEX[name]
@@ -190,14 +222,3 @@ class Rom(object):
             return self.WR_TO_HEX[rank]
         except:
             return None
-            
-    # returns whether a character is legal to be boogaloo'd
-    # ideally this always returns true but atm there are some limits
-    # mostly nonexistent classes with no equivalent
-    # eg.
-    #   * Non-dragon shapeshifters (eg. Laguz, Taguel)
-    #   * Lords
-    #   * Non-Lance Armour Knights and Axe Cavaliers
-    #   * Axe Wyverns
-    def legalCharacter(self, char):
-        return self.getHexFromClass(char['class']) != None

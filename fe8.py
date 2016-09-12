@@ -1,7 +1,7 @@
-# module for fe8's data
-# i probably should have made GAMES a class and instantiated fe8 as one
 from rom import Rom
 
+# class inheriting Rom which contains FE8's data
+# doesn't override any functions
 class FE8(Rom):
     def __init__(self, file):
         super().__init__(file)
