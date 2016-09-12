@@ -6,50 +6,28 @@ import fe8
 
 # returns a list of 'num' random characters
 # to replace characters in the given game
-def getRandomCharacters(data, ver):
+def getRandomCharacters(game, data):
     # create a list of all characters
     allChars = []
-    for game in data.keys():
-        allChars += [data[game][char] for char in data[game]]
+    for g in data.keys():
+        allChars += [data[g][char] for char in data[g]]
     
     # randomly assign characters from said list
     chars = {}
-    for old in data[ver]:
+    for old in data[game.GAME_VERSION]:
         while old not in chars:
             check = random.randrange(len(allChars))
             # check if legal before adding
-            if not legalCharacter(allChars[check], ver):
+            if not game.legalCharacter(allChars[check]):
                 continue
             
             # check the stats are "kind of" close so they don't instantly break the game
-            if not statDiffsOk(data[ver][old], allChars[check]):
+            if not statDiffsOk(data[game.GAME_VERSION][old], allChars[check]):
                 continue
             chars[old] = allChars[check]
             allChars.pop(check)
     return chars
 
-# returns whether a character is legal to be boogaloo'd
-# ideally this always returns true but atm there are some limits
-# mostly nonexistent classes with no equivalent
-# eg.
-#   * Non-dragon shapeshifters (eg. Laguz, Taguel)
-#   * Lords
-#   * Non-Lance Armour Knights and Axe Cavaliers
-#   * Axe Wyverns
-def legalCharacter(character, ver):
-    '''
-    if ver == "FE6":
-        if not fe6.legalCharacter(character):
-            return False
-    if ver == "FE7":
-        if not fe7.legalCharacter(characer):
-            return False
-    '''
-    if ver == "FE8":
-        if not fe8.legalCharacter(character):
-            return False
-    return True
-    
 def statDiffsOk(char1, char2):
     diffs = { 'rel' : {}, 'abs' : {} }
     # get stat differentials

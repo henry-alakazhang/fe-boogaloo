@@ -2,6 +2,8 @@ import sys, re
 
 # my modules
 import data, rom, fe8
+from rom import Rom
+from fe8 import FE8
 
 # figure out which game we're trying to edit
 ver  = "?"
@@ -30,27 +32,25 @@ print("Game detected as", ver)
 # parse data files
 print("Setting up data...")
 
-# I can't believe this works...
-# It sets GAME_DATA to a different MODULE based on input.
-GAME_DATA = fe8 if ver == "FE8" else (fe7 if ver == "FE7" else fe6)
+game = FE8(GAME_FILE) #if ver == "FE8" else (fe7() if ver == "FE7" else fe6())
 CHAR_DATA = data.parseDataFile('chardata.csv')
-rom.applyPatch(GAME_FILE, GAME_DATA.ANTIHUFFMAN)
-print("Text table found at", hex(GAME_DATA.getTextTable(GAME_FILE)))
+game.applyPatch(game.ANTIHUFFMAN)
+print("Text table found at", hex(game.getTextTable()))
 
 ############################
 # GET BOOGALOO!
 print("Beginning BOOGALOOFICATION")
 
 averages = data.calculateAverages(CHAR_DATA)
-replace = data.getRandomCharacters(CHAR_DATA, ver)
+replace = data.getRandomCharacters(game, CHAR_DATA)
 
 data.rescaleStats(replace, averages, ver)
 CLASS_DATA = {} # populated as needed from the game itself
 
 #sys.stdout = open("boogalog.txt", 'w')
 for char in replace.keys():
-    oldChar = rom.getCharData(GAME_FILE, GAME_DATA, char)
-    replace[char] = rom.convertCharacter(GAME_DATA, replace[char])
+    oldChar = game.getCharData(char)
+    replace[char] = game.convertCharacter(replace[char])
     print (char, "->", replace[char]['name'])
     for stat in replace[char]:
         if stat in oldChar:
@@ -59,7 +59,7 @@ for char in replace.keys():
 #                print (stat, ":", CHAR_DATA[ver][char][stat], "->", replace[char][stat])
                 # load class data from ROM and cache it in CLASS_DATA
                 if (replace[char]['class name'] not in CLASS_DATA.keys()):
-                    CLASS_DATA[replace[char]['class name']] = rom.getClassData(GAME_FILE, GAME_DATA, replace[char]['class name'])
+                    CLASS_DATA[replace[char]['class name']] = game.getClassData(replace[char]['class name'])
                 oldChar[stat] = int(replace[char][stat]) - CLASS_DATA[replace[char]['class name']][stat]
             else:
                 oldChar[stat] = int(replace[char][stat])
@@ -69,4 +69,4 @@ for char in replace.keys():
                 oldChar['Item ' + str(i+1)] = replace[char]['items'][i]
         else:
             oldChar[stat] = replace[char][stat]
-    rom.setCharData(GAME_FILE, GAME_DATA, char, oldChar)
+    game.setCharData(char, oldChar)
