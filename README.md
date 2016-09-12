@@ -7,5 +7,5 @@ Instructions:
 * Download the code .ZIP and unzip it
 * Download Python 3
 * Open CMD and move to the code folder
-* Run "python boogaloo.py <YOUR ROM>"
+* Run "python boogaloo.py \<YOUR ROM\>"
 * Enjoy the Boogaloo!
