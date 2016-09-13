@@ -80,7 +80,7 @@ def parseDataFile(filename):
 
     heads = ["game", "name", "class", "level", "HP-base", "STR-base", "SKL-base", "SPD-base", "LUK-base", "DEF-base", "RES-base", \
     "HP-grow", "STR-grow", "SKL-grow", "SPD-grow", "LUK-grow", "DEF-grow", "RES-grow",
-    "Sword", "Lance", "Axe", "Bow", "Staff", "Anima", "Light", "Dark"]
+    "sword", "lance", "axe", "bow", "staff", "anima", "light", "dark"]
 
     charfile = open(filename, newline='')
     charreader = csv.DictReader(charfile, heads, "items")

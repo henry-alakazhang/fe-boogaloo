@@ -3,7 +3,7 @@ from rom import Rom
 # class inheriting Rom which contains FE8's data
 # doesn't override any functions
 class FE8(Rom):
-    def __init__(self, file):
+    def __init__(self, file):   
         super().__init__(file)
         self.GAME_VERSION = "FE8"
         self.CHAR_TABLE = 0x803D30
@@ -14,6 +14,8 @@ class FE8(Rom):
         self.CLASS_ENTRY_LENGTH = 84
 
         self.TEXT_TABLE_INDIRECT = 0x00A2A0
+        
+        self.GENERIC_MINI = 0x02
         self.CHAR_TO_HEX = {
             'Eirika' : 0x01, 
             'Seth' : 0x02, 
@@ -156,14 +158,23 @@ class FE8(Rom):
             'Dragon Zombie' : 0x65, 
             'Demon King' : 0x66, 
         }
-
+        
         self.CLASS_TO_CLASS = {
             'Nomad Trooper' : 'Ranger',
             'Villager' : 'Recruit',
             'Dark Sage' : 'Druid',
             'Dark Knight' : 'Mage Knight',
-            'Manakete' : 'Manakete (F)'
+            'Manakete' : 'Manakete (F)', # other one is a dracozombie
+            'Cat' : 'Cerberus',
+            'Tiger' : 'Cerberus',
+            'Wolf' : 'Cerberus',
+            'Lion' : 'Cerberus',
+            'Heron' : 'Dancer',
+            'Lord (Marth)' : 'Lord (Eirika)',
+            'Lord (Eliwood)' : 'Lord (Eirika)',
+            'Lord (Roy)' : 'Lord (Eirika)',
         }
+        
         self.ITEM_TO_HEX = {
             '' : 0x00,
             'Iron Sword' : 0x01,
@@ -335,8 +346,8 @@ class FE8(Rom):
             'Vague Katti' : 'Shamshir',
             'Concoction' : 'Vulnerary',
             'Wind' : 'Fire',
-            'Elthunder' : 'Thunder',
-            'Elwind' : 'Aircalibur',
+            'Elthunder' : 'Elfire',
+            'Elwind' : 'Thunder',
             'Arcfire' : 'Fimbulvetr',
             'Arcthunder' : 'Fimbulvetr',
             'Arcwind' : 'Aircalibur',
@@ -352,6 +363,11 @@ class FE8(Rom):
             'Tiger Spirit' : 'Elfire',
             'Dragon Spirit' : 'Fimbulvetr',
             'Excalibur' : 'Aircalibur',
+            'Claw' : 'Fire Fang',
+            'Fang' : 'Fire Fang',
+            'Beaststone' : 'Fire Fang',
+            'Great Fang' : 'Hell Fang',
+            'Beaststone+' : 'Hell Fang',
         }
 
         self.WR_TO_HEX = {
@@ -365,7 +381,7 @@ class FE8(Rom):
         }
 
         self.WEAPON_TYPES = [
-            "Sword", "Lance", "Axe", "Bow", "Staff", "Anima", "Light", "Dark"
+            "sword", "lance", "axe", "bow", "staff", "anima", "light", "dark"
         ]
 
         # generated this one with a script too lol

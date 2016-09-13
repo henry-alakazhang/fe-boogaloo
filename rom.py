@@ -1,27 +1,64 @@
-# class for reading and writing data to the ROM, as well as holding ROM attributes
-# not used by itself; inherited by FE* classes
 import codecs, struct, re
 
+# class for reading and writing data to the ROM, as well as holding ROM attributes
+# not used by itself; inherited by FE* classes
 class Rom(object):
-    # can i just say, why the hell does the nightmare module have an arbitrarily SKIPPED
-    # byte instead of just calling it UNKNOWN like everything else that's UNKNOWN?
+    '''
+    all the member variables a (GBA) rom needs to have
+    GAME_VERSION        name of game version (eg. "FE8")
+    CHAR_TABLE          address of start of character data table
+    CHAR_ENTRY_LENGTH   length of a character data entry
+    CHAR_UNIT_LENGTH    length of a character entry in the chapter unit list
+    CLASS_TABLE         address of start of class data table
+    CLASS_ENTRY_LENGTH  length of a character data entry
+    TEXT_TABLE_INDIRECT address of a pointer to the start of the text table
+    GENERIC_MINI        index of Good Guys generic mini portrait
+    CHAR_TO_HEX         mapping of character names to hex values
+    CHAR_TO_UNIT_TABLE  mapping of character names to unit list entry addresses
+    CLASS_TO_HEX        mapping of class names to hex values
+    CLASS_TO_CLASS      mapping of non-game class names to in-game class names
+    ITEM_TO_HEX         mapping of item names to hex values
+    ITEM_TO_ITEM        mapping of non-game item names to in-game item names
+    WR_TO_HEX           mapping of weapon rank text to hex values
+    WEAPON_TYPES        array of weapon types
+    ANTIHUFFMAN         dict-form patch (ie. address : byte mappings) for an antihuffman patch
+    '''
+
+    # can i just say, why the hell does the nightmare module have an arbitrarily SKIPPED byte
+    # especially when that's supposed to be desc_HI but it's just always 0x00
+    # in fact it actually limits you when you're hacking if you wanna change the index??
     # #salty
     CHAR_FORMAT = [
-        "Name_LO", "Name_HI", "Desc", "SKIPPED", "Char #", "class", "Portrait", "X1", "Mini", "Affinity", "X2",
-        "LevelN", "HP-base", "STR-base", "SKL-base", "SPD-base", "DEF-base", "RES-base", "LUK-base",
-        "CON-base", "Sword", "Lance", "Axe", "Bow", "Staff", "Anima", "Light", "Dark",
+        "name_LO", "name_HI", "desc_LO", "desc_HI", "num", "class", "portrait", "X1", "mini", "affinity", "X2",
+        "level", "HP-base", "STR-base", "SKL-base", "SPD-base", "DEF-base", "RES-base", "LUK-base",
+        "CON-base", "sword", "lance", "axe", "bow", "staff", "anima", "light", "dark",
         "HP-grow", "STR-grow", "SKL-grow", "SPD-grow", "DEF-grow", "RES-grow", "LUK-grow"
     ]
 
+    # also speaking of nightmare modules why are some of these things out of order? like especially unknowns
     CHAR_UNIT_FORMAT = [
-        "Char", "class", "X1", "Levels", "X", "Y", "X2", "X3", "Ref1", "Ref2", "Ref3", "Ref4",
-        "Item 1", "Item 2", "Item 3", "Item 4"
+        "char", "class", "X1", "levels", "X", "Y", "X2", "X3", "ref1", "ref2", "ref3", "ref4",
+        "item 1", "item 2", "item 3", "item 4"
     ]
 
     CLASS_FORMAT = [
-        "Name_HI", "Name_LO", "Desc_HI", "Desc_LO", "C No", "Promo", "Sprite", "Walk", "Portrait", "X1", "X2",
+        "name_LO", "name_HI", "desc_LO", "desc_HI", "cnum", "promo", "sprite", "walk", "portrait", "X1", "X2",
         "HP-base", "STR-base", "SKL-base", "SPD-base", "DEF-base", "RES-base", "CON-base"
     ]
+    
+    GAME_TO_CONTINENT = {
+        'FE1' : 'Archanaea',
+        'FE3' : 'Archanaea',
+        'FE4' : 'Jugdral',
+        'FE5' : 'Jugdral',
+        'FE6' : 'Elibe',
+        'FE7' : 'Elibe',
+        'FE8' : 'Magvel',
+        'FE9' : 'Tellius',
+        'FE10' : 'Tellius',
+        'FE12' : 'Archanea',
+        'FE13' : 'Fates?'
+    }
     
     def __init__(self, file):
         self.file = file
@@ -102,11 +139,13 @@ class Rom(object):
             self.file.seek(possibleSpot)
             for s in Rom.CHAR_UNIT_FORMAT:
                 # don't overwrite coordinates or chapters get fucky
-                if s.startswith("Item") or s == "class":
+                if s.startswith("item") or s == "class":
                     self.file.write(new[s].to_bytes(1, byteorder='little', signed=False))
                 else:
                     self.file.seek(1, 1)
-        self.writeTextToROM([new['Name_HI'], new['Name_LO']], new['name'])
+        self.writeTextToROM([new['name_HI'], new['name_LO']], new['name'])
+        self.writeTextToROM([new['desc_HI'], new['desc_LO']], \
+            "A mysterious hero from the \1faraway land of " + Rom.GAME_TO_CONTINENT[new['game']] + ".")
         
     # returns data of class (name) as a dict with keys CLASS_FORMAT
     def getClassData(self, name):
@@ -124,12 +163,12 @@ class Rom(object):
     def convertCharacter(self, oldChar):
         newChar = {}
         for key in oldChar:
-            if (key == 'class'):
+            if key == 'class':
                 newChar['class name'] = oldChar[key]
                 newChar[key] = self.getHexFromClass(oldChar[key])
-            elif (key == 'character'):
+            elif key == 'character':
                 newChar[key] = self.getHexFromChar(oldChar[key])
-            elif (key == "items"):
+            elif key == "items":
                 newChar[key] = []
                 for i in range(4):
                     newName = self.getHexFromItem(oldChar[key][i])
@@ -153,12 +192,11 @@ class Rom(object):
     # mostly nonexistent classes with no equivalent
     # eg.
     #   * Beast shapeshifters (eg. Laguz, Taguel)
-    #       * TODO: make them compatible with FE8 as Hellhounds
-    #   * Bird shapeshifters (eg. Ravens, Herons)
-    #       * I guess i could make herons = dancers
-    #   * Lords
-    #       * TODO: make lords replacing lords ok
-    #       * requires editing Prf weapons
+    #       * Compatible with FE8 as Hellhounds/Cerberus
+    #   * Bird shapeshifters (eg. Ravens)
+    #       * Herons are dancers
+    #   * Lords with unsupported weapons
+    #       * OK if they use the Rapier that chrom starts with in every fire embull game
     #   * GBA classes with weird weapons (eg. Axe Knight/Cav/Wyvern, Sword Peg)
     #       * I mean these are technically possible, I just need to fix chardata.csv
     
@@ -205,7 +243,6 @@ class Rom(object):
             return self.CLASS_TABLE + self.getHexFromClass(name) * self.CLASS_ENTRY_LENGTH
         except:
             return None
-        
 
     def getHexFromItem(self, name):
         try:
