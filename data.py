@@ -13,7 +13,7 @@ def getRandomCharacters(game, data):
     
     # randomly assign characters from said list
     chars = {}
-    for old in data[game.GAME_VERSION]:
+    for old in game.CHAR_TO_HEX.keys():
         while old not in chars:
             check = random.randrange(len(allChars))
             # check if legal before adding

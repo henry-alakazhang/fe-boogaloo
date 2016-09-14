@@ -14,6 +14,7 @@ class Rom(object):
     TEXT_TABLE_INDIRECT address of a pointer to the start of the text table
     GENERIC_MINI        index of Good Guys generic mini portrait
     CHAR_TO_HEX         mapping of character names to hex values
+    CHAR_UNIT_FORMAT    array of format of character units in chapter unit lists
     CHAR_TO_UNIT_TABLE  mapping of character names to unit list entry addresses
     CLASS_TO_HEX        mapping of class names to hex values
     CLASS_TO_CLASS      mapping of non-game class names to in-game class names
@@ -36,11 +37,6 @@ class Rom(object):
     ]
 
     # also speaking of nightmare modules why are some of these things out of order? like especially unknowns
-    CHAR_UNIT_FORMAT = [
-        "char", "class", "X1", "levels", "X", "Y", "X2", "X3", "ref1", "ref2", "ref3", "ref4",
-        "item 1", "item 2", "item 3", "item 4"
-    ]
-
     CLASS_FORMAT = [
         "name_LO", "name_HI", "desc_LO", "desc_HI", "cnum", "promo", "sprite", "walk", "portrait", "X1", "X2",
         "HP-base", "STR-base", "SKL-base", "SPD-base", "DEF-base", "RES-base", "CON-base"
@@ -117,8 +113,9 @@ class Rom(object):
         
         # load unit stats (ie. first load of character)
         self.file.seek(self.getCharacterUnitAddress(name)[0])
-        for s in Rom.CHAR_UNIT_FORMAT:
+        for s in self.CHAR_UNIT_FORMAT:
             charData[s] = int.from_bytes(self.file.read(1), byteorder='little', signed=False)
+
         return charData
         
     # sets character data of (name) with (new)
@@ -126,26 +123,29 @@ class Rom(object):
     def setCharData(self, name, new):
         # store characer stats
         self.file.seek(self.getCharacterAddress(name))
+        
+        new['X1'] = 0
         for s in Rom.CHAR_FORMAT:
             # only bases can be signed...
             if re.search('base', s) != None:
                 self.file.write(new[s].to_bytes(1, byteorder='little', signed=True))
             else:
                 self.file.write(new[s].to_bytes(1, byteorder='little', signed=False))
-                
+        
+        
         # store character unit data
         # TODO: be smart about where to load the character - each character should only need max 2
         for possibleSpot in self.getCharacterUnitAddress(name):
             self.file.seek(possibleSpot)
-            for s in Rom.CHAR_UNIT_FORMAT:
+            for s in self.CHAR_UNIT_FORMAT:
                 # don't overwrite coordinates or chapters get fucky
                 if s.startswith("item") or s == "class":
                     self.file.write(new[s].to_bytes(1, byteorder='little', signed=False))
                 else:
                     self.file.seek(1, 1)
-        self.writeTextToROM([new['name_HI'], new['name_LO']], new['name'])
-        self.writeTextToROM([new['desc_HI'], new['desc_LO']], \
-            "A mysterious hero from the \1faraway land of " + Rom.GAME_TO_CONTINENT[new['game']] + ".")
+        # self.writeTextToROM([new['name_HI'], new['name_LO']], new['name'])
+        # self.writeTextToROM([new['desc_HI'], new['desc_LO']], \
+           # "A mysterious hero from the \1faraway land of " + Rom.GAME_TO_CONTINENT[new['game']] + ".")
         
     # returns data of class (name) as a dict with keys CLASS_FORMAT
     def getClassData(self, name):
@@ -202,16 +202,24 @@ class Rom(object):
     
     def legalCharacter(self, char):
         return self.getHexFromClass(char['class']) != None
-        
-    # dynamically load text table address
+    
+    '''    
+    # dynamically loads in tables from the rom itself
+    # only useful for hacks, but it's useless without dynamic unit pointer loading as well.
+    # so it's not enabled yet
+    def dynamicLoadTables(self):
+        self.file.seek(self.TEXT_TABLE_INDIRECT)
+        self.TEXT_TABLE = int.from_bytes(self.file.read(4), byteorder='little', signed=False) - 0x8000000 
+    '''    
+
     def getTextTable(self):
         try:
-            return self.TEXT_TABLE
+            return self.TEXT_TABLE        
         except:
             self.file.seek(self.TEXT_TABLE_INDIRECT)
             self.TEXT_TABLE = int.from_bytes(self.file.read(4), byteorder='little', signed=False) - 0x8000000 
             return self.TEXT_TABLE
-    
+        
     def getHexFromChar(self, name):
         try:
             return self.CHAR_TO_HEX[name]

@@ -5,7 +5,7 @@ import data
 
 # my classes
 from rom import Rom
-#from fe7 import FE7
+from fe7 import FE7
 from fe8 import FE8
 
 
@@ -22,14 +22,12 @@ ver  = "?"
 GAME_FILE = open(filename, 'rb+')
 GAME_FILE.seek(0xAA)
 gameCode = GAME_FILE.read(6).decode('UTF-8')
-if gameCode == "E.AE7E" :
-#    game = FE8(GAME_FILE)
-    print("Unsupported game version: FE7. Exiting.")
-    exit(1)
+if gameCode == "E\x00AE7E" :
+    game = FE7(GAME_FILE)
 elif gameCode == "2EBE8E":
     game = FE8(GAME_FILE)
 elif gameCode == "6.AFEJ":
-#    game = FE8(GAME_FILE)
+#    game = FE6(GAME_FILE)
     print("Unsupported game version: FE7. Exiting.")
     exit(1)
 else:
@@ -37,7 +35,7 @@ else:
     print("ERROR: Illegal game version! Please use one of the GBAFE games.")
     exit(1)
 print ("Detected as", game.GAME_VERSION)
-
+    
 ############################
 # parse data files
 print("Applying Anti-Huffman patch.")
@@ -60,6 +58,7 @@ CLASS_DATA = {} # populated as needed from the game itself
 
 #sys.stdout = open("boogalog.txt", 'w')
 # insert characters over old ones
+
 for char in replace.keys():
     oldChar = game.getCharData(char)
     replace[char] = game.convertCharacter(replace[char])
@@ -82,7 +81,7 @@ for char in replace.keys():
         else:
             oldChar[stat] = replace[char][stat]
     game.setCharData(char, oldChar)
-    
+
 print("Outrealms Boogaloo completed!")
 input("Press ENTER to continue...")
 GAME_FILE.close();
