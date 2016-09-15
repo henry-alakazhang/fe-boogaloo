@@ -81,7 +81,7 @@ class Rom(object):
         tablePtr = self.getTextTable()
         tablePtr += (index[0] * 0x100 + index[1])*4
         
-    #    print("Name", string, "being written to", hex(index[0]), hex(index[1]))
+        print(string, "being written to", hex(index[0]), hex(index[1]))
         
         # append text to end of ROM
         self.file.seek(0, 2)
@@ -143,9 +143,9 @@ class Rom(object):
                     self.file.write(new[s].to_bytes(1, byteorder='little', signed=False))
                 else:
                     self.file.seek(1, 1)
-        # self.writeTextToROM([new['name_HI'], new['name_LO']], new['name'])
-        # self.writeTextToROM([new['desc_HI'], new['desc_LO']], \
-           # "A mysterious hero from the \1faraway land of " + Rom.GAME_TO_CONTINENT[new['game']] + ".")
+        self.writeTextToROM([new['name_HI'], new['name_LO']], new['name'])
+        self.writeTextToROM([new['desc_HI'], new['desc_LO']], \
+           "A mysterious hero from the \1faraway land of " + Rom.GAME_TO_CONTINENT[new['game']] + ".")
         
     # returns data of class (name) as a dict with keys CLASS_FORMAT
     def getClassData(self, name):
