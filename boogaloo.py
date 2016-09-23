@@ -8,9 +8,11 @@ from rom import Rom
 from fe7 import FE7
 from fe8 import FE8
 
-
 if len(sys.argv) > 1:
-    filename = sys.argv[len(sys.argv) - 1]
+    # load user input files
+    if (len(sys.argv) > 2):
+        replace_filename = sys.argv[2]
+    filename = sys.argv[1]
 else:
     print("Enter filename of your GBA ROM (or drag it into this window): ")
     # remove quotes from file
@@ -51,7 +53,9 @@ print("Beginning BOOGALOOFICATION!")
 
 # get new characters
 averages = data.calculateAverages(CHAR_DATA)
-replace = data.getRandomCharacters(game, CHAR_DATA)
+if replace_filename != None:
+    replace = data.getSetCharacters(game, CHAR_DATA, replace_filename)
+replace = data.getRandomCharacters(game, CHAR_DATA, replace)
 
 data.rescaleStats(replace, averages, game.GAME_VERSION)
 CLASS_DATA = {} # populated as needed from the game itself

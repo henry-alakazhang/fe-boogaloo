@@ -81,7 +81,7 @@ class Rom(object):
         tablePtr = self.getTextTable()
         tablePtr += (index[0] * 0x100 + index[1])*4
         
-        print(string, "being written to", hex(index[0]), hex(index[1]))
+#        print(string, "being written to", hex(index[0]), hex(index[1]))
         
         # append text to end of ROM
         self.file.seek(0, 2)
@@ -208,16 +208,16 @@ class Rom(object):
     # only useful for hacks, but it's useless without dynamic unit pointer loading as well.
     # so it's not enabled yet
     def dynamicLoadTables(self):
-        self.file.seek(self.TEXT_TABLE_INDIRECT)
-        self.TEXT_TABLE = int.from_bytes(self.file.read(4), byteorder='little', signed=False) - 0x8000000 
+        self.TEXT_TABLE = readBytes(4, TEXT_TABLE_INDIRECT) - 0x8000000
+        self.CHAR_TABLE = readBytes(4, CHAR_TABLE_INDIRECT) - 0x8000000
+        self.CLASS_TABLE = readBytes(4, CLASS_TABLE_INDIRECT) - 0x8000000
     '''    
 
     def getTextTable(self):
         try:
             return self.TEXT_TABLE        
         except:
-            self.file.seek(self.TEXT_TABLE_INDIRECT)
-            self.TEXT_TABLE = int.from_bytes(self.file.read(4), byteorder='little', signed=False) - 0x8000000 
+            self.TEXT_TABLE = readBytes(4, TEXT_TABLE_INDIRECT) - 0x8000000
             return self.TEXT_TABLE
         
     def getHexFromChar(self, name):

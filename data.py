@@ -3,18 +3,43 @@
 
 import statistics, csv, random, re
 
-# returns a list of 'num' random characters
+# reads replacement wants from a file
+def getSetCharacters(game, data, file):
+    replaceFile = open(file, 'r')
+    
+    chars = {}
+    for old in game.CHAR_TO_HEX.keys():
+        chars[old] = None
+    
+    for line in replaceFile:
+        words = line.strip().split(',')
+        old = words[0].strip()
+        newGame = words[1].split(' ')[0].strip()
+        newChar = words[1].split(' ')[1].strip()
+        try:
+            if old not in chars:
+                print("Replacement", old + ",", newGame, newChar, "impossible:", old, "isn't in", game.GAME_VERSION)
+            elif not game.legalCharacter(data[newGame][newChar]):
+                print("Replacement", old + ",", newGame, newChar, "impossible:", newGame, newChar, "cannot be inserted into", game.GAME_VERSION + "")
+            else:
+                chars[old] = data[newGame][newChar]
+        except:
+            print("Replacement", old + ",", newGame, newChar, "impossible:", newGame, newChar, "doesn't exist")
+    replaceFile.close();
+    
+    return chars
+
+# returns a mapping of random characters
 # to replace characters in the given game
-def getRandomCharacters(game, data):
+def getRandomCharacters(game, data, chars):
     # create a list of all characters
     allChars = []
     for g in data.keys():
         allChars += [data[g][char] for char in data[g]]
     
     # randomly assign characters from said list
-    chars = {}
     for old in game.CHAR_TO_HEX.keys():
-        while old not in chars:
+        while chars[old] == None:
             check = random.randrange(len(allChars))
             # check if legal before adding
             if not game.legalCharacter(allChars[check]):
@@ -37,10 +62,9 @@ def statDiffsOk(char1, char2):
             diffs['rel'][stat] = (s1/s2 if (s2 != 0) else s1)
             diffs['abs'][stat] = s1 - s2
 
-    # if characters are close in level, just throw em in
-    # temporarily removed due to seeming weirdness
-#    if abs(int(char1['level']) - int(char2['level'])) < 3:
-#        return True
+    # don't replace unpromoted units with prepromotes (feels bad man)
+    if abs(int(char1['level']) - int(char2['level'])) > 20:
+        return False
     
     # if in general too different 
     if abs(sum(diffs['abs'].values())) > 5 and abs(1-statistics.mean(diffs['rel'].values())) > 0.2:
@@ -62,9 +86,10 @@ def statDiffsOk(char1, char2):
 def calculateAverages(data):
     avgs = {}
     for game in data.keys():
-        # atm don't bother with bases
+        # atm don't bother with bases (or LUK)
         avgs[game] = { #"HP-base": 0, "STR-base": 0, "SKL-base": 0, "SPD-base": 0, "LUK-base": 0, "DEF-base": 0, "RES-base": 0,
-             "HP-grow": 0, "STR-grow": 0, "SKL-grow": 0, "SPD-grow": 0, "LUK-grow": 0, "DEF-grow": 0, "RES-grow": 0}
+             "HP-grow": 0, "STR-grow": 0, "SKL-grow": 0, "SPD-grow": 0, #"LUK-grow": 0, 
+             "DEF-grow": 0, "RES-grow": 0}
         for stat in avgs[game].keys():
             # build a list of all the values of a stat for a given game
             statList = [data[game][c][stat] for c in data[game]]
@@ -100,5 +125,6 @@ def rescaleStats(chars, averages, ver):
             chars[c][stat] = int(chars[c][stat])
             if gameAvgs[stat] == 0:
                 gameAvgs[stat] = chars[c][stat] if chars[c][stat] != 0 else 1
+            print(chars[c]['name'], "Stat", stat + ":", chars[c][stat], "->", int(chars[c][stat] * (goal[stat] / gameAvgs[stat])))
             chars[c][stat] = int(chars[c][stat] * (goal[stat] / gameAvgs[stat]))
     return chars
