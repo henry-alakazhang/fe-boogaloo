@@ -16,6 +16,8 @@ class FE8(Rom):
 #        self.CLASS_TABLE_INDIRECT = 0x17DB0
 
         self.TEXT_TABLE_INDIRECT = 0x00A2A0
+        self.file.seek(self.TEXT_TABLE_INDIRECT)
+        self.TEXT_TABLE = int.from_bytes(self.file.read(4), byteorder='little', signed=False) - 0x8000000
 #        self.dynamicLoadTables()
         
         self.CHAR_TO_HEX = {

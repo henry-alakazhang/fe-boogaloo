@@ -217,7 +217,7 @@ class Rom(object):
         try:
             return self.TEXT_TABLE        
         except:
-            self.TEXT_TABLE = readBytes(4, TEXT_TABLE_INDIRECT) - 0x8000000
+            self.TEXT_TABLE = self.readBytes(4, TEXT_TABLE_INDIRECT) - 0x8000000
             return self.TEXT_TABLE
         
     def getHexFromChar(self, name):
