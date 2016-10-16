@@ -16,6 +16,7 @@ else:
     print("Enter filename of your GBA ROM (or drag it into this window): ")
     # remove quotes from file
     filename = re.sub(r'"', '', sys.stdin.readline().strip());
+    replace_filename = None
 
 print("Checking game file.... ", end = "")
 # figure out which game we're trying to edit
