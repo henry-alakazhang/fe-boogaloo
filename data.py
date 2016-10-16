@@ -39,7 +39,7 @@ def getRandomCharacters(game, data, chars):
     
     # randomly assign characters from said list
     for old in game.CHAR_TO_HEX.keys():
-        while chars[old] == None:
+        while old not in chars or chars[old] == None:
             check = random.randrange(len(allChars))
             # check if legal before adding
             if not game.legalCharacter(allChars[check]):

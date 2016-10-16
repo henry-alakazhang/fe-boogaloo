@@ -10,9 +10,8 @@ from fe8 import FE8
 
 if len(sys.argv) > 1:
     # load user input files
-    if (len(sys.argv) > 2):
-        replace_filename = sys.argv[2]
     filename = sys.argv[1]
+    replace_filename = sys.argv[2] if len(sys.argv) > 2 else None
 else:
     print("Enter filename of your GBA ROM (or drag it into this window): ")
     # remove quotes from file
@@ -49,10 +48,15 @@ CHAR_DATA = data.parseDataFile('chardata.csv')
 
 ############################
 # GET BOOGALOO!
-print("Beginning BOOGALOOFICATION!")
+print("Beginning BOOGALOOFICATION! Logging into boogalog.txt")
+
+# log into log file
+temp = sys.stdout
+sys.stdout = open("boogalog.txt", 'w')
 
 # get new characters
 averages = data.calculateAverages(CHAR_DATA)
+replace = {}
 if replace_filename != None:
     replace = data.getSetCharacters(game, CHAR_DATA, replace_filename)
 replace = data.getRandomCharacters(game, CHAR_DATA, replace)
@@ -60,7 +64,6 @@ replace = data.getRandomCharacters(game, CHAR_DATA, replace)
 data.rescaleStats(replace, averages, game.GAME_VERSION)
 CLASS_DATA = {} # populated as needed from the game itself
 
-#sys.stdout = open("boogalog.txt", 'w')
 # insert characters over old ones
 
 for char in replace.keys():
@@ -86,6 +89,7 @@ for char in replace.keys():
             oldChar[stat] = replace[char][stat]
     game.setCharData(char, oldChar)
 
+sys.stdout = temp
 print("Outrealms Boogaloo completed!")
 input("Press ENTER to continue...")
 GAME_FILE.close();
